@@ -8,8 +8,8 @@ const firebaseConfig = {
   projectId: "shift-calendar-jamie",
   storageBucket: "shift-calendar-jamie.firebasestorage.app",
   messagingSenderId: "25685416926",
-  appId: "1:25685416926:web:21fe88f17c76450a0adb4f",
-  measurementId: "G-HJ422L0982",
+  appId: "1:25685416926:web:f7392441a42ca86c0adb4f",
+  measurementId: "G-XYE101M7JN",
 };
 
 export const firebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);

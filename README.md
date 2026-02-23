@@ -33,6 +33,8 @@ Set these env vars first:
 - `FIREBASE_AUTH_DOMAIN`
 - `FIREBASE_PROJECT_ID`
 
+For the Next.js app, `FIREBASE_API_KEY` is also mapped to `NEXT_PUBLIC_FIREBASE_API_KEY` in `next.config.js`, so Vercel only needs `FIREBASE_API_KEY` configured.
+
 ## Persist admin edits to Firestore
 
 The dashboard now saves shift edits to:
