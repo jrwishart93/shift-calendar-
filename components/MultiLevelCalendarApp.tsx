@@ -137,8 +137,8 @@ export default function MultiLevelCalendarApp() {
   if (!isSignedIn) {
     return (
       <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col justify-center gap-6 p-6">
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
-          <p className="text-xs uppercase tracking-wide text-cyan-300">Family Shift Planner</p>
+        <section className="glass-panel rounded-2xl p-6">
+          <p className="text-xs uppercase tracking-wide text-blue-300">Family Shift Planner</p>
           <h1 className="mt-2 text-2xl font-semibold text-slate-100">Sign in to your shared home dashboard</h1>
           <p className="mt-2 text-sm text-slate-300">
             Manage separate calendars for each person and combine them into one shared timeline.
@@ -151,12 +151,9 @@ export default function MultiLevelCalendarApp() {
               value={userName}
               onChange={(event) => setUserName(event.target.value)}
               placeholder="Jamie"
-              className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 outline-none ring-cyan-400 focus:ring"
+              className="rounded-lg border border-slate-700 bg-slate-950/80 px-3 py-2 text-slate-100 outline-none ring-blue-400 focus:ring"
             />
-            <button
-              type="submit"
-              className="mt-2 rounded-lg bg-cyan-400 px-4 py-2 font-semibold text-slate-950 hover:bg-cyan-300"
-            >
+            <button type="submit" className="btn-primary mt-2">
               Enter dashboard
             </button>
           </form>
@@ -167,14 +164,14 @@ export default function MultiLevelCalendarApp() {
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-4 p-4">
-      <header className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-        <p className="text-xs uppercase tracking-wide text-cyan-300">Dashboard</p>
+      <header className="glass-panel rounded-xl p-4">
+        <p className="text-xs uppercase tracking-wide text-blue-300">Dashboard</p>
         <h1 className="mt-1 text-xl font-semibold text-slate-100">Welcome, {userName}</h1>
         <p className="text-sm text-slate-300">Create individual schedules and overlay them in the shared calendar view.</p>
       </header>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <form onSubmit={addMember} className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+        <form onSubmit={addMember} className="glass-panel rounded-xl p-4">
           <h2 className="text-lg font-semibold text-slate-100">Add family member / friend</h2>
           <div className="mt-3 grid gap-3">
             <input
@@ -182,20 +179,20 @@ export default function MultiLevelCalendarApp() {
               value={memberForm.name}
               onChange={(event) => setMemberForm((prev) => ({ ...prev, name: event.target.value }))}
               placeholder="Name"
-              className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+              className="rounded-lg border border-slate-700 bg-slate-950/80 px-3 py-2 text-sm"
             />
             <input
               type="text"
               value={memberForm.relationship}
               onChange={(event) => setMemberForm((prev) => ({ ...prev, relationship: event.target.value }))}
               placeholder="Relationship (Husband, Wife, Child...)"
-              className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+              className="rounded-lg border border-slate-700 bg-slate-950/80 px-3 py-2 text-sm"
             />
-            <button type="submit" className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-950">Add person</button>
+            <button type="submit" className="btn-secondary text-sm">Add person</button>
           </div>
         </form>
 
-        <form onSubmit={addEntry} className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+        <form onSubmit={addEntry} className="glass-panel rounded-xl p-4">
           <h2 className="text-lg font-semibold text-slate-100">Add calendar item</h2>
           <div className="mt-3 grid gap-3">
             <input
@@ -203,18 +200,18 @@ export default function MultiLevelCalendarApp() {
               value={entryForm.title}
               onChange={(event) => setEntryForm((prev) => ({ ...prev, title: event.target.value }))}
               placeholder="Shift, class, party..."
-              className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+              className="rounded-lg border border-slate-700 bg-slate-950/80 px-3 py-2 text-sm"
             />
             <input
               type="date"
               value={entryForm.date}
               onChange={(event) => setEntryForm((prev) => ({ ...prev, date: event.target.value }))}
-              className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+              className="rounded-lg border border-slate-700 bg-slate-950/80 px-3 py-2 text-sm"
             />
             <select
               value={entryForm.calendarType}
               onChange={(event) => setEntryForm((prev) => ({ ...prev, calendarType: event.target.value as CalendarType }))}
-              className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+              className="rounded-lg border border-slate-700 bg-slate-950/80 px-3 py-2 text-sm"
             >
               <option value="work">Work calendar</option>
               <option value="personal">Personal calendar</option>
@@ -223,7 +220,7 @@ export default function MultiLevelCalendarApp() {
             <select
               value={entryForm.ownerId}
               onChange={(event) => setEntryForm((prev) => ({ ...prev, ownerId: event.target.value }))}
-              className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+              className="rounded-lg border border-slate-700 bg-slate-950/80 px-3 py-2 text-sm"
             >
               {members.map((member) => (
                 <option key={member.id} value={member.id}>{member.name}</option>
@@ -233,7 +230,7 @@ export default function MultiLevelCalendarApp() {
               value={entryForm.note}
               onChange={(event) => setEntryForm((prev) => ({ ...prev, note: event.target.value }))}
               placeholder="Day notes"
-              className="min-h-20 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+              className="min-h-20 rounded-lg border border-slate-700 bg-slate-950/80 px-3 py-2 text-sm"
             />
             <label className="flex items-center gap-2 text-sm text-slate-200">
               <input
@@ -243,17 +240,17 @@ export default function MultiLevelCalendarApp() {
               />
               Mark this date
             </label>
-            <button type="submit" className="rounded-lg bg-cyan-400 px-3 py-2 text-sm font-semibold text-slate-950">Save event</button>
+            <button type="submit" className="btn-primary text-sm">Save event</button>
           </div>
         </form>
       </section>
 
-      <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+      <section className="glass-panel rounded-xl p-4">
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setSelectedView("shared")}
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${selectedView === "shared" ? "bg-cyan-400 text-slate-950" : "bg-slate-800 text-slate-200"}`}
+            className={`rounded-full px-3 py-1 text-xs font-semibold transition ${selectedView === "shared" ? "bg-blue-500 text-white shadow-[0_0_18px_rgba(59,130,246,0.5)]" : "bg-slate-800/80 text-slate-200"}`}
           >
             Shared calendar
           </button>
@@ -262,7 +259,7 @@ export default function MultiLevelCalendarApp() {
               key={key}
               type="button"
               onClick={() => setSelectedView(key as CalendarType)}
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${selectedView === key ? "bg-cyan-400 text-slate-950" : "bg-slate-800 text-slate-200"}`}
+              className={`rounded-full px-3 py-1 text-xs font-semibold transition ${selectedView === key ? "bg-violet-500 text-white shadow-[0_0_18px_rgba(139,92,246,0.45)]" : "bg-slate-800/80 text-slate-200"}`}
             >
               {label}
             </button>
@@ -271,7 +268,7 @@ export default function MultiLevelCalendarApp() {
           <select
             value={selectedOwner}
             onChange={(event) => setSelectedOwner(event.target.value)}
-            className="ml-auto rounded-lg border border-slate-700 bg-slate-950 px-2 py-1 text-xs"
+            className="ml-auto rounded-lg border border-slate-700 bg-slate-950/80 px-2 py-1 text-xs"
           >
             <option value="all">All people</option>
             {members.map((member) => (
@@ -287,14 +284,14 @@ export default function MultiLevelCalendarApp() {
             filteredEntries.map((entry) => {
               const ownerName = members.find((member) => member.id === entry.ownerId)?.name ?? "Unknown";
               return (
-                <article key={entry.id} className="rounded-lg border border-slate-700 bg-slate-950/80 p-3">
+                <article key={entry.id} className="rounded-lg border border-slate-700/80 bg-slate-950/70 p-3 shadow-[0_0_20px_rgba(59,130,246,0.08)]">
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="font-medium text-slate-100">{entry.title}</h3>
                     <span className="text-xs text-slate-400">{entry.date}</span>
                   </div>
-                  <p className="mt-1 text-xs text-cyan-300">{CALENDAR_LABELS[entry.calendarType]} • {ownerName}</p>
+                  <p className="mt-1 text-xs text-blue-300">{CALENDAR_LABELS[entry.calendarType]} • {ownerName}</p>
                   {entry.note ? <p className="mt-2 text-sm text-slate-300">{entry.note}</p> : null}
-                  {entry.marked ? <p className="mt-2 text-xs font-semibold text-amber-300">Marked date</p> : null}
+                  {entry.marked ? <p className="mt-2 text-xs font-semibold text-teal-300">Marked date</p> : null}
                 </article>
               );
             })
