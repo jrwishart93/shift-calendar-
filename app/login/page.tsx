@@ -3,6 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { FormEvent, useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/hooks/useAuth";
@@ -78,6 +79,13 @@ export default function LoginPage() {
         >
           {isSubmitting ? "Signing in..." : "Sign in"}
         </button>
+
+        <Link
+          href="/signup"
+          className="block w-full rounded border border-black px-4 py-2 text-center text-sm font-medium text-black"
+        >
+          Sign up
+        </Link>
       </form>
 
       {error ? <p className="mt-2 text-sm text-red-700">{error.message}</p> : null}
