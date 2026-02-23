@@ -21,7 +21,11 @@ export function updateResolveShiftOverrideCache(overridesByDate: Record<string, 
   });
 }
 
-export async function resolveShift(date: string, firestoreShift?: EnrichedShift): Promise<EnrichedShift> {
+export async function resolveShift(
+  date: string,
+  firestoreShift?: EnrichedShift,
+  useCorePattern = true,
+): Promise<EnrichedShift | null> {
   if (firestoreShift) {
     console.log("[resolveShift] using firestore shift", { date, code: firestoreShift.code });
     return firestoreShift;
@@ -31,6 +35,10 @@ export async function resolveShift(date: string, firestoreShift?: EnrichedShift)
   if (override) {
     console.log("[resolveShift] using override", { date, code: override.code });
     return enrichShift({ date, code: override.code, note: override.note });
+  }
+
+  if (!useCorePattern) {
+    return null;
   }
 
   const coreCode = getCoreShift(date);

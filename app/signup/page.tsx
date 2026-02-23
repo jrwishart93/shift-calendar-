@@ -3,14 +3,18 @@
 export const dynamic = "force-dynamic";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/hooks/useAuth";
+import { JAMIE_ACCESS_CODE } from "@/lib/signup";
 
 export default function SignUpPage() {
   const { signUp, currentUser, error } = useAuth();
+  const router = useRouter();
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [accessCode, setAccessCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -20,15 +24,21 @@ export default function SignUpPage() {
     setSuccessMessage("");
 
     try {
-      const result = await signUp(email, password, displayName);
-      const calendarMessage = result.createdCalendarId
-        ? `First calendar created (${result.createdCalendarId}).`
-        : "User created. Waiting for invite to a calendar.";
+      const result = await signUp(email, password, displayName, accessCode);
+      const isJamieCalendar = result.selectedCalendar === "jamie";
 
-      setSuccessMessage(`Sign-up successful. ${calendarMessage}`);
+      setSuccessMessage(
+        isJamieCalendar
+          ? "Sign-up successful. Jamie's shifts loaded."
+          : "Sign-up successful. Your calendar is empty so you can add your own shifts.",
+      );
+
       setDisplayName("");
       setEmail("");
       setPassword("");
+      setAccessCode("");
+
+      router.push(`/dashboard?access=${isJamieCalendar ? "jamie" : "custom"}`);
     } catch {
       // Error is exposed by the hook and rendered below.
     } finally {
@@ -38,13 +48,13 @@ export default function SignUpPage() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center p-6">
-      <h1 className="mb-4 text-2xl font-semibold">Create account</h1>
+      <h1 className="mb-2 text-2xl font-semibold">Create account</h1>
+      <p className="mb-4 text-sm text-gray-600">Sign up with email and password. Access code is optional.</p>
 
       <form onSubmit={handleSubmit} className="space-y-4 rounded border border-gray-300 p-4">
         <label className="block">
-          <span className="mb-1 block text-sm font-medium">Display name</span>
+          <span className="mb-1 block text-sm font-medium">Display name (optional)</span>
           <input
-            required
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             className="w-full rounded border border-gray-300 px-3 py-2"
@@ -75,6 +85,19 @@ export default function SignUpPage() {
             className="w-full rounded border border-gray-300 px-3 py-2"
             placeholder="••••••••"
           />
+        </label>
+
+        <label className="block">
+          <span className="mb-1 block text-sm font-medium">Access code (optional)</span>
+          <input
+            value={accessCode}
+            onChange={(e) => setAccessCode(e.target.value)}
+            className="w-full rounded border border-gray-300 px-3 py-2"
+            placeholder="Enter code for Jamie's shifts"
+          />
+          <span className="mt-1 block text-xs text-gray-500">
+            Use <strong>{JAMIE_ACCESS_CODE}</strong> to load Jamie's shifts.
+          </span>
         </label>
 
         <button

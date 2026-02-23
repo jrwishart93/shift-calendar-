@@ -17,7 +17,7 @@ type UseAuthResult = {
   currentUser: User | null;
   loading: boolean;
   error: AuthError;
-  signUp: (email: string, password: string, displayName: string) => Promise<SignUpResult>;
+  signUp: (email: string, password: string, displayName: string, accessCode?: string) => Promise<SignUpResult>;
   signIn: (email: string, password: string) => Promise<User>;
   signOut: () => Promise<void>;
 };
@@ -37,10 +37,10 @@ export function useAuth(): UseAuthResult {
     return unsubscribe;
   }, []);
 
-  const signUp = useCallback(async (email: string, password: string, displayName: string) => {
+  const signUp = useCallback(async (email: string, password: string, displayName: string, accessCode?: string) => {
     setError(null);
     try {
-      const result = await signUpWithSetup(email, password, displayName);
+      const result = await signUpWithSetup(email, password, displayName, accessCode);
       return result;
     } catch (err) {
       const normalizedError = err instanceof Error ? err : new Error("Sign up failed");
