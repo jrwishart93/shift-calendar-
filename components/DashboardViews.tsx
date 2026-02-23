@@ -31,7 +31,17 @@ const SHIFT_LEGEND = [
   { code: "PH / A", label: "Public Holiday",   color: "text-indigo-300",  dot: "bg-indigo-400"  },
 ] as const;
 
-export default function DashboardViews({ shifts, today }: { shifts: EnrichedShift[]; today: string }) {
+export default function DashboardViews({
+  shifts,
+  today,
+  calendarName = "Jamie's 2026 Shifts",
+  useCorePattern = true,
+}: {
+  shifts: EnrichedShift[];
+  today: string;
+  calendarName?: string;
+  useCorePattern?: boolean;
+}) {
   const [activeTab, setActiveTab] = useState<TabId>("month");
   const [selectedShift, setSelectedShift] = useState<EnrichedShift | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -101,7 +111,7 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
       <header className="shrink-0 border-b border-[#1f3760] bg-[#000a24]">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <div>
-            <h1 className="text-lg font-bold leading-none text-slate-100">Jamie's 2026 Shifts</h1>
+            <h1 className="text-lg font-bold leading-none text-slate-100">{calendarName}</h1>
             <p className="mt-0.5 text-[11px] text-slate-500">Shift rota</p>
           </div>
           <div className="flex items-center gap-2">
@@ -135,6 +145,7 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
           <div className="h-full">
             <MonthCalendar
               shifts={effectiveShifts}
+              useCorePattern={useCorePattern}
               isAdmin={canEdit}
               onDaySelect={(shift, date) => {
                 setSelectedShift(shift);
@@ -149,6 +160,7 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
             <WeekView
               shifts={effectiveShifts}
               today={today}
+              useCorePattern={useCorePattern}
               onDaySelect={(shift, date) => {
                 setSelectedShift(shift);
                 setSelectedDate(date);

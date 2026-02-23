@@ -10,6 +10,7 @@ import MonthStats from "./MonthStats";
 
 type MonthCalendarProps = {
   shifts: EnrichedShift[];
+  useCorePattern?: boolean;
   isAdmin?: boolean;
   onDaySelect?: (shift: EnrichedShift | null, date: string) => void;
 };
@@ -20,10 +21,15 @@ const monthFormatter = new Intl.DateTimeFormat(undefined, {
   timeZone: "UTC"
 });
 
-export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: MonthCalendarProps) {
+export default function MonthCalendar({
+  shifts,
+  useCorePattern = true,
+  isAdmin = false,
+  onDaySelect,
+}: MonthCalendarProps) {
   const today = new Date();
   const [displayDate, setDisplayDate] = useState(new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1)));
-  const [resolvedShiftsByDate, setResolvedShiftsByDate] = useState<Record<string, EnrichedShift>>({});
+  const [resolvedShiftsByDate, setResolvedShiftsByDate] = useState<Record<string, EnrichedShift | null>>({});
 
   const shiftByDate = useMemo(() => Object.fromEntries(shifts.map((shift) => [shift.date, shift])), [shifts]);
   const weeks = useMemo(() => generateMonthGrid(displayDate.getUTCFullYear(), displayDate.getUTCMonth()), [displayDate]);
@@ -35,7 +41,7 @@ export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: 
       const dates = weeks.flat().map((day) => day.date);
       const resolvedEntries = await Promise.all(
         dates.map(async (date) => {
-          const resolved = await resolveShift(date, shiftByDate[date]);
+          const resolved = await resolveShift(date, shiftByDate[date], useCorePattern);
           return [date, resolved] as const;
         }),
       );
@@ -55,11 +61,11 @@ export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: 
     return () => {
       active = false;
     };
-  }, [shiftByDate, weeks]);
+  }, [shiftByDate, useCorePattern, weeks]);
 
   const monthPrefix = `${String(displayDate.getUTCFullYear())}-${String(displayDate.getUTCMonth() + 1).padStart(2, "0")}`;
   const monthShifts = useMemo(
-    () => Object.values(resolvedShiftsByDate).filter((s) => s.date.startsWith(monthPrefix)),
+    () => Object.values(resolvedShiftsByDate).filter((s): s is EnrichedShift => s !== null && s.date.startsWith(monthPrefix)),
     [resolvedShiftsByDate, monthPrefix],
   );
 
