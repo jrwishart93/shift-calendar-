@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { initFirebaseAnalytics } from "@/app/firebase";
 
 type CalendarType = "work" | "personal" | "children";
 
@@ -65,6 +66,10 @@ export default function MultiLevelCalendarApp() {
   const [selectedOwner, setSelectedOwner] = useState<string>("all");
 
   const [memberForm, setMemberForm] = useState({ name: "", relationship: "" });
+
+  useEffect(() => {
+    void initFirebaseAnalytics();
+  }, []);
   const [entryForm, setEntryForm] = useState({
     title: "",
     date: "",

@@ -1,0 +1,25 @@
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAnalytics, isSupported } from "firebase/analytics";
+import { getFirestore } from "firebase/firestore";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC1unoVa6IKfVsbelTbXYeu0kIXBGcODX4",
+  authDomain: "shift-calendar-jamie.firebaseapp.com",
+  projectId: "shift-calendar-jamie",
+  storageBucket: "shift-calendar-jamie.firebasestorage.app",
+  messagingSenderId: "25685416926",
+  appId: "1:25685416926:web:21fe88f17c76450a0adb4f",
+  measurementId: "G-HJ422L0982",
+};
+
+export const firebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
+
+export const db = getFirestore(firebaseApp);
+
+export async function initFirebaseAnalytics() {
+  if (typeof window === "undefined") return null;
+  const supported = await isSupported();
+  if (!supported) return null;
+
+  return getAnalytics(firebaseApp);
+}
