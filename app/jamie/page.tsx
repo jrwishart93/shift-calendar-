@@ -11,9 +11,9 @@ export default function JamiePublicPage() {
   const monthPrefix = today.slice(0, 7);
 
   return (
-    <main>
+    <main className="px-safe pb-safe">
       <Header />
-      <div className="mx-auto flex max-w-3xl flex-col gap-6 p-4">
+      <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-4">
         <section>
           <h2 className="mb-3 text-lg font-semibold">Upcoming 14 Days</h2>
           <div className="space-y-2">

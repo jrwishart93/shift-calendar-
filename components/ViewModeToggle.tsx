@@ -12,8 +12,8 @@ export default function ViewModeToggle({ viewMode, onChange }: { viewMode: ViewM
           aria-selected={viewMode === mode}
           type="button"
           onClick={() => onChange(mode)}
-          className={`rounded-lg px-4 py-1.5 text-sm font-medium capitalize transition ${
-            viewMode === mode ? "bg-cyan-500 text-slate-950" : "text-slate-300 hover:bg-slate-800"
+          className={`min-h-[44px] rounded-lg px-4 text-base font-medium capitalize transition active:scale-[0.98] ${
+            viewMode === mode ? "bg-cyan-500 text-slate-950" : "text-slate-300 hover:bg-slate-800 active:bg-slate-700"
           }`}
         >
           {mode}

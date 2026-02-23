@@ -45,7 +45,7 @@ export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: 
         <button
           type="button"
           onClick={() => moveMonth(-1)}
-          className="rounded-lg border border-slate-700 px-3 py-1 text-sm text-slate-200 hover:bg-slate-800"
+          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-700 px-4 text-base text-slate-200 transition hover:bg-slate-800 active:scale-[0.98] active:bg-slate-700"
           aria-label="Go to previous month"
         >
           ←
@@ -54,7 +54,7 @@ export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: 
         <button
           type="button"
           onClick={() => moveMonth(1)}
-          className="rounded-lg border border-slate-700 px-3 py-1 text-sm text-slate-200 hover:bg-slate-800"
+          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-700 px-4 text-base text-slate-200 transition hover:bg-slate-800 active:scale-[0.98] active:bg-slate-700"
           aria-label="Go to next month"
         >
           →

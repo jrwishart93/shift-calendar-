@@ -15,7 +15,7 @@ export default function ShareButton() {
     <button
       type="button"
       onClick={handleShare}
-      className="rounded-lg bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950"
+      className="min-h-[44px] rounded-lg bg-sky-500 px-4 py-2 text-base font-semibold text-slate-950 transition active:scale-[0.98] active:bg-sky-400"
     >
       Copy Public Link
     </button>

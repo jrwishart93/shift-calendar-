@@ -8,9 +8,9 @@ export default function MonthPage() {
   const shifts = getAllShifts().filter((shift) => shift.date.startsWith(monthPrefix));
 
   return (
-    <main>
+    <main className="px-safe pb-safe">
       <Header />
-      <div className="mx-auto max-w-3xl p-4">
+      <div className="mx-auto max-w-3xl px-4 py-4">
         <MonthGrid shifts={shifts} />
       </div>
     </main>

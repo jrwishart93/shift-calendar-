@@ -9,9 +9,9 @@ export default function HomePage() {
   const today = getToday();
 
   return (
-    <main>
+    <main className="px-safe pb-safe">
       <Header />
-      <div className="mx-auto flex max-w-3xl flex-col gap-6 p-4">
+      <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-4">
         <div className="rounded-xl border border-slate-800 bg-slate-900 p-4">
           <p className="text-sm text-slate-300">Today</p>
           <p className="text-xl font-semibold">{today}</p>
