@@ -3,7 +3,7 @@ import { getAnalytics, isSupported } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC1unoVa6IKfVsbelTbXYeu0kIXBGcODX4",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: "shift-calendar-jamie.firebaseapp.com",
   projectId: "shift-calendar-jamie",
   storageBucket: "shift-calendar-jamie.firebasestorage.app",
