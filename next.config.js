@@ -1,6 +1,10 @@
-/** @type {import('next').NextConfig} */
+/** @type {import("next").NextConfig} */
 const nextConfig = {
-  reactStrictMode: true
+  reactStrictMode: true,
+  env: {
+    NEXT_PUBLIC_FIREBASE_API_KEY:
+      process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? process.env.FIREBASE_API_KEY,
+  },
 };
 
 module.exports = nextConfig;
