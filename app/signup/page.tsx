@@ -38,7 +38,7 @@ export default function SignUpPage() {
       setPassword("");
       setAccessCode("");
 
-      router.push(`/dashboard?access=${isJamieCalendar ? "jamie" : "custom"}`);
+      router.push("/dashboard");
     } catch {
       // Error is exposed by the hook and rendered below.
     } finally {

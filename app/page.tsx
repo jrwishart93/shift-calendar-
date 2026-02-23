@@ -1,6 +1,5 @@
-import DashboardViews from "@/components/DashboardViews";
-import { getAllShifts, getToday } from "@/app/lib";
+import { redirect } from "next/navigation";
 
 export default function HomePage() {
-  return <DashboardViews shifts={getAllShifts()} today={getToday()} />;
+  redirect("/dashboard");
 }
