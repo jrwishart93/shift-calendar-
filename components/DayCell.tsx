@@ -62,7 +62,7 @@ export default function DayCell({
       className={`relative flex h-full w-full flex-col items-center justify-center rounded-xl border p-1 text-center transition duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 ${
         isCurrentMonth ? styles.card : "border-slate-800 bg-[#070f23]"
       } ${isWeekend ? "shadow-[inset_0_0_0_1px_rgba(148,163,184,0.04)]" : ""}`}
-      aria-label={`${ariaParts.join(", ")}. ${isAdmin ? "Admin editable" : "Viewer read only"}`}
+      aria-label={`${ariaParts.join(", ")}. ${isAdmin ? "Editable when signed in" : "Read only"}`}
     >
       {/* Day number — top-left */}
       <span className={`absolute left-1.5 top-1 text-[10px] font-semibold leading-none ${isCurrentMonth ? "text-slate-400" : "text-slate-700"}`}>

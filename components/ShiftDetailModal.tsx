@@ -44,7 +44,7 @@ export default function ShiftDetailModal({ date, shift, isAdmin, onClose, onSave
   return (
     <dialog open className="fixed inset-0 z-20 m-0 flex h-full w-full items-center justify-center bg-black/70 p-4">
       <div className="w-full max-w-sm rounded-2xl border border-slate-700 bg-slate-900 p-4 text-slate-100">
-        <p className="text-xs uppercase tracking-wide text-slate-400">{isAdmin ? "Admin edit mode" : "Read only"}</p>
+        <p className="text-xs uppercase tracking-wide text-slate-400">{isAdmin ? "Edit mode" : "Read only"}</p>
         <h3 className="mt-1 text-lg font-semibold">{date}</h3>
 
         {shift ? (
@@ -54,6 +54,7 @@ export default function ShiftDetailModal({ date, shift, isAdmin, onClose, onSave
               <>
                 <p className="mt-2 text-sm">{shift.startTime && shift.endTime ? `${shift.startTime}–${shift.endTime}` : "No hours"}</p>
                 <p className="mt-2 text-sm text-slate-400">{shift.note || "No note"}</p>
+                <p className="mt-3 text-xs text-cyan-300">Sign in from the dashboard header to edit this shift.</p>
               </>
             ) : (
               <div className="mt-4 space-y-3">
