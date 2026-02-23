@@ -12,6 +12,7 @@ import BottomTabBar, { type TabId } from "./BottomTabBar";
 import { useAuth } from "@/hooks/useAuth";
 import { saveShiftEdit, subscribeToShiftEdits } from "@/lib/shiftEdits";
 import { saveOverride, subscribeToOverrides } from "@/lib/shiftOverrides";
+import { saveCorePatternToBackend } from "@/lib/corePattern";
 import { updateResolveShiftOverrideCache } from "@/utils/resolveShift";
 
 const STORAGE_KEY = "viewMode";
@@ -141,6 +142,17 @@ export default function DashboardViews({
   useEffect(() => {
     updateResolveShiftOverrideCache(overridesByDate);
   }, [overridesByDate]);
+
+  useEffect(() => {
+    if (!canEdit) {
+      return;
+    }
+
+    void saveCorePatternToBackend().catch((error) => {
+      console.warn("[DashboardViews] failed to persist core pattern", error);
+    });
+  }, [canEdit]);
+
 
   function handleTabChange(tab: TabId) {
     setActiveTab(tab);
