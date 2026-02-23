@@ -1,41 +1,55 @@
-import { doc, onSnapshot, serverTimestamp, setDoc, type Unsubscribe } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  onSnapshot,
+  query,
+  serverTimestamp,
+  setDoc,
+  type Unsubscribe,
+} from "firebase/firestore";
 
 import type { EnrichedShift } from "@/components/types";
 import { db } from "@/lib/firebase";
 
-const DEFAULT_CALENDAR_ID = process.env.NEXT_PUBLIC_FIREBASE_CALENDAR_ID ?? "jamie-2026";
+export const DEFAULT_CALENDAR_ID = process.env.NEXT_PUBLIC_FIREBASE_CALENDAR_ID ?? "jamie-2026";
 
-function shiftEditDocRef(date: string) {
-  return doc(db, "calendars", DEFAULT_CALENDAR_ID, "shiftEdits", date);
+function shiftEditsCollectionRef(calendarId: string) {
+  return collection(db, "calendars", calendarId, "shiftEdits");
 }
 
-export function subscribeToShiftEdit(
-  date: string,
-  onUpdate: (shift: EnrichedShift | null) => void,
+function shiftEditDocRef(calendarId: string, date: string) {
+  return doc(db, "calendars", calendarId, "shiftEdits", date);
+}
+
+export function subscribeToShiftEdits(
+  onUpdate: (shiftsByDate: Record<string, EnrichedShift>) => void,
   onError?: (error: Error) => void,
+  calendarId = DEFAULT_CALENDAR_ID,
 ): Unsubscribe {
   return onSnapshot(
-    shiftEditDocRef(date),
+    query(shiftEditsCollectionRef(calendarId)),
     (snapshot) => {
-      if (!snapshot.exists()) {
-        onUpdate(null);
-        return;
-      }
+      const next: Record<string, EnrichedShift> = {};
 
-      onUpdate(snapshot.data() as EnrichedShift);
+      snapshot.forEach((documentSnapshot) => {
+        const data = documentSnapshot.data() as EnrichedShift;
+        next[documentSnapshot.id] = {
+          ...data,
+          date: data.date || documentSnapshot.id,
+        };
+      });
+
+      onUpdate(next);
     },
     (error) => {
-      if (onError) {
-        onError(error);
-      }
+      onError?.(error);
     },
   );
 }
 
-export async function saveShiftEdit(shift: EnrichedShift): Promise<void> {
-  await setDoc(shiftEditDocRef(shift.date), {
+export async function saveShiftEdit(shift: EnrichedShift, calendarId = DEFAULT_CALENDAR_ID): Promise<void> {
+  await setDoc(shiftEditDocRef(calendarId, shift.date), {
     ...shift,
     updatedAt: serverTimestamp(),
   });
 }
-
