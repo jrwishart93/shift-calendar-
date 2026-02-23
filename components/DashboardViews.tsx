@@ -11,6 +11,8 @@ import ShareButton from "./ShareButton";
 import BottomTabBar, { type TabId } from "./BottomTabBar";
 import { useAuth } from "@/hooks/useAuth";
 import { saveShiftEdit, subscribeToShiftEdits } from "@/lib/shiftEdits";
+import { saveOverride, subscribeToOverrides } from "@/lib/shiftOverrides";
+import { updateResolveShiftOverrideCache } from "@/utils/resolveShift";
 
 const STORAGE_KEY = "viewMode";
 const EDITS_STORAGE_KEY = "shiftEdits";
@@ -34,6 +36,7 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
   const [selectedShift, setSelectedShift] = useState<EnrichedShift | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [editedShifts, setEditedShifts] = useState<Record<string, EnrichedShift>>({});
+  const [overridesByDate, setOverridesByDate] = useState<Record<string, { code: string; note?: string }>>({});
   const { currentUser, signOut } = useAuth();
   const canEdit = Boolean(currentUser);
 
@@ -43,7 +46,7 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
       setActiveTab(savedMode);
     }
 
-    const unsubscribe = subscribeToShiftEdits(
+    const unsubscribeShiftEdits = subscribeToShiftEdits(
       (updates) => {
         setEditedShifts(updates);
       },
@@ -61,8 +64,22 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
       },
     );
 
-    return unsubscribe;
+    const unsubscribeOverrides = subscribeToOverrides((updates) => {
+      setOverridesByDate(updates);
+      updateResolveShiftOverrideCache(updates);
+      console.log("[DashboardViews] overrides updated", Object.keys(updates).length);
+    });
+
+    return () => {
+      unsubscribeShiftEdits();
+      unsubscribeOverrides();
+    };
   }, []);
+
+
+  useEffect(() => {
+    updateResolveShiftOverrideCache(overridesByDate);
+  }, [overridesByDate]);
 
   function handleTabChange(tab: TabId) {
     setActiveTab(tab);
@@ -191,13 +208,32 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
                 throw new Error("Please sign in to edit and save shifts.");
               }
 
-              setEditedShifts((current) => {
-                const next = { ...current, [updated.date]: updated };
-                window.localStorage.setItem(EDITS_STORAGE_KEY, JSON.stringify(next));
-                return next;
+              const hasStoredShift = Boolean(shifts.find((shift) => shift.date === updated.date) || editedShifts[updated.date]);
+              if (hasStoredShift) {
+                console.log("[DashboardViews] saving stored shift edit", updated.date);
+                setEditedShifts((current) => {
+                  const next = { ...current, [updated.date]: updated };
+                  window.localStorage.setItem(EDITS_STORAGE_KEY, JSON.stringify(next));
+                  return next;
+                });
+
+                await saveShiftEdit(updated);
+                return;
+              }
+
+              console.log("[DashboardViews] saving generated day as override", updated.date);
+              await saveOverride(updated.date, {
+                code: updated.code,
+                note: updated.note,
               });
 
-              await saveShiftEdit(updated);
+              setOverridesByDate((current) => ({
+                ...current,
+                [updated.date]: {
+                  code: updated.code,
+                  note: updated.note,
+                },
+              }));
             }}
           />
         ) : null}

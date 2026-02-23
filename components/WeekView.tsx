@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { EnrichedShift } from "./types";
 import { typeColours } from "./shift-utils";
+import { resolveShift } from "@/utils/resolveShift";
 
 type WeekViewProps = {
   shifts: EnrichedShift[];
@@ -10,25 +11,65 @@ type WeekViewProps = {
   onDaySelect?: (shift: EnrichedShift | null, date: string) => void;
 };
 
+function getStartOfWeek(date: string): Date {
+  const current = new Date(`${date}T00:00:00Z`);
+  const day = current.getUTCDay();
+  const offset = day === 0 ? -6 : 1 - day;
+  current.setUTCDate(current.getUTCDate() + offset);
+  return current;
+}
+
 export default function WeekView({ shifts, today, onDaySelect }: WeekViewProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [weekShifts, setWeekShifts] = useState<EnrichedShift[]>([]);
 
-  const todayIndex = useMemo(() => shifts.findIndex((shift) => shift.date >= today), [shifts, today]);
+  const shiftByDate = useMemo(() => Object.fromEntries(shifts.map((shift) => [shift.date, shift])), [shifts]);
+
+  const visibleDates = useMemo(() => {
+    const startOfWeek = getStartOfWeek(today);
+
+    return Array.from({ length: 7 }, (_, index) => {
+      const next = new Date(startOfWeek);
+      next.setUTCDate(startOfWeek.getUTCDate() + index);
+      return next.toISOString().slice(0, 10);
+    });
+  }, [today]);
 
   useEffect(() => {
-    if (!containerRef.current || todayIndex < 0) {
+    let active = true;
+
+    async function resolveVisibleWeek() {
+      const resolved = await Promise.all(
+        visibleDates.map((date) => resolveShift(date, shiftByDate[date])),
+      );
+
+      if (!active) {
+        return;
+      }
+
+      setWeekShifts(resolved);
+    }
+
+    void resolveVisibleWeek();
+
+    return () => {
+      active = false;
+    };
+  }, [visibleDates, shiftByDate]);
+
+  useEffect(() => {
+    if (!containerRef.current) {
       return;
     }
 
-    const cardWidth = 260;
-    containerRef.current.scrollTo({ left: todayIndex * (cardWidth + 12), behavior: "smooth" });
-  }, [todayIndex]);
+    containerRef.current.scrollTo({ left: 0, behavior: "smooth" });
+  }, [weekShifts]);
 
   return (
     <section className="rounded-2xl border border-slate-800 bg-slate-900 p-3">
       <h2 className="mb-3 text-base font-semibold text-white">Week view</h2>
       <div ref={containerRef} className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1" aria-label="Weekly shift cards">
-        {shifts.map((shift) => (
+        {weekShifts.map((shift) => (
           <button
             key={shift.date}
             type="button"
