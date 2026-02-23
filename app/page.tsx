@@ -1,5 +1,6 @@
-import MultiLevelCalendarApp from "@/components/MultiLevelCalendarApp";
+import DashboardViews from "@/components/DashboardViews";
+import { getAllShifts, getToday } from "@/app/lib";
 
 export default function HomePage() {
-  return <MultiLevelCalendarApp />;
+  return <DashboardViews shifts={getAllShifts()} today={getToday()} />;
 }
