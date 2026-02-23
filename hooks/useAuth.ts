@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  browserLocalPersistence,
   onAuthStateChanged,
+  setPersistence,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   type User,
@@ -29,6 +31,11 @@ export function useAuth(): UseAuthResult {
 
   useEffect(() => {
     const auth = getFirebaseAuth();
+
+    setPersistence(auth, browserLocalPersistence).catch((persistenceError) => {
+      console.error("Failed to enable local auth persistence:", persistenceError);
+    });
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
       setLoading(false);
