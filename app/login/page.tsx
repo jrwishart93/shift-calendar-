@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/hooks/useAuth";
+import { JAMIE_ACCESS_CODE } from "@/lib/signup";
 
 export default function LoginPage() {
   const { signIn, error, currentUser, signOut } = useAuth();
@@ -14,6 +15,8 @@ export default function LoginPage() {
   const [nextPath, setNextPath] = useState("/dashboard");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [accessCode, setAccessCode] = useState("");
+  const [accessError, setAccessError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -41,6 +44,20 @@ export default function LoginPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleAccessBypass = () => {
+    if (accessCode.trim() !== JAMIE_ACCESS_CODE) {
+      setAccessError("Invalid access code.");
+      return;
+    }
+
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("jamieAccessBypass", "true");
+    }
+
+    setAccessError(null);
+    router.push("/dashboard?guest=jamie");
   };
 
   return (
@@ -89,8 +106,26 @@ export default function LoginPage() {
         >
           Sign up
         </Link>
+
+        <div className="rounded-xl border border-slate-700/80 bg-slate-900/50 p-3">
+          <p className="mb-2 text-xs text-slate-300">Or continue without an account using an access code.</p>
+          <input
+            value={accessCode}
+            onChange={(e) => setAccessCode(e.target.value)}
+            className="auth-input"
+            placeholder="Enter access code"
+          />
+          <button
+            type="button"
+            onClick={handleAccessBypass}
+            className="btn-secondary mt-2 w-full text-sm"
+          >
+            Continue with access code
+          </button>
+        </div>
       </form>
 
+        {accessError ? <p className="mt-3 text-sm text-rose-300">{accessError}</p> : null}
         {error ? <p className="mt-3 text-sm text-rose-300">{error.message}</p> : null}
 
         {currentUser ? (

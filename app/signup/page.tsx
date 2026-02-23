@@ -15,6 +15,8 @@ export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [accessCode, setAccessCode] = useState("");
+  const [bypassCode, setBypassCode] = useState("");
+  const [bypassError, setBypassError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -44,6 +46,20 @@ export default function SignUpPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleAccessBypass = () => {
+    if (bypassCode.trim() !== JAMIE_ACCESS_CODE) {
+      setBypassError("Invalid access code.");
+      return;
+    }
+
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("jamieAccessBypass", "true");
+    }
+
+    setBypassError(null);
+    router.push("/dashboard?guest=jamie");
   };
 
   return (
@@ -105,8 +121,22 @@ export default function SignUpPage() {
           <button type="submit" disabled={isSubmitting} className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-50">
             {isSubmitting ? "Creating account..." : "Sign up"}
           </button>
+
+          <div className="rounded-xl border border-slate-700/80 bg-slate-900/50 p-3">
+            <p className="mb-2 text-xs text-slate-300">Or skip sign-up using an access code.</p>
+            <input
+              value={bypassCode}
+              onChange={(e) => setBypassCode(e.target.value)}
+              className="auth-input"
+              placeholder="Enter access code"
+            />
+            <button type="button" onClick={handleAccessBypass} className="btn-secondary mt-2 w-full text-sm">
+              Continue with access code
+            </button>
+          </div>
         </form>
 
+        {bypassError ? <p className="mt-2 text-sm text-rose-300">{bypassError}</p> : null}
         {successMessage ? <p className="mt-4 text-sm text-emerald-300">{successMessage}</p> : null}
         {error ? <p className="mt-2 text-sm text-rose-300">{error.message}</p> : null}
         {currentUser ? <p className="mt-2 text-sm text-slate-300">Signed in as {currentUser.email}</p> : null}

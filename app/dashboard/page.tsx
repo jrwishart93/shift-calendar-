@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { collectionGroup, doc, documentId, getDoc, getDocs, limit, query, where } from "firebase/firestore";
 
 import DashboardViews from "@/components/DashboardViews";
@@ -42,9 +42,20 @@ async function getFirstCalendarForUser(uid: string): Promise<CalendarContext | n
 
 export default function DashboardPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { currentUser, loading } = useAuth();
   const [calendarContext, setCalendarContext] = useState<CalendarContext | null>(null);
   const [isResolving, setIsResolving] = useState(true);
+  const hasGuestBypass = useMemo(() => {
+    const hasGuestParam = searchParams.get("guest") === "jamie";
+    if (typeof window === "undefined") {
+      return hasGuestParam;
+    }
+
+    const hasStoredBypass = window.localStorage.getItem("jamieAccessBypass") === "true";
+    return hasGuestParam || hasStoredBypass;
+  }, [searchParams]);
+
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -52,8 +63,23 @@ export default function DashboardPage() {
       return;
     }
 
-    if (!currentUser) {
+    if (!currentUser && !hasGuestBypass) {
       router.replace("/welcome");
+      return;
+    }
+
+    if (!currentUser && hasGuestBypass) {
+      setCalendarContext({
+        calendarId: "guest-jamie",
+        calendarName: "Jamie Shift Calendar",
+        hasCorePattern: false,
+      });
+      setIsResolving(false);
+      setError(null);
+      return;
+    }
+
+    if (!currentUser) {
       return;
     }
 
@@ -79,7 +105,7 @@ export default function DashboardPage() {
     }
 
     void resolveMembership();
-  }, [currentUser, loading, router]);
+  }, [currentUser, hasGuestBypass, loading, router]);
 
   if (loading || isResolving) {
     return <main className="flex min-h-screen items-center justify-center text-sm text-slate-500">Loading dashboard...</main>;
