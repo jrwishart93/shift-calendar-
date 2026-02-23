@@ -1,4 +1,5 @@
 import { shiftMap } from "@/data/shiftMap";
+import { getShiftTimes } from "@/utils/getShiftTimes";
 import type { EnrichedShift, RawShift } from "./types";
 
 export const typeColours: Record<string, string> = {
@@ -37,17 +38,13 @@ export function getDayCellStyles(type?: string) {
 
 export function enrichShift(shift: RawShift): EnrichedShift {
   const map = shiftMap[shift.code];
-
-  // Saturday early shifts end at 16:00 instead of 15:00
-  const isSaturdayEarly =
-    (shift.code === "E" || shift.code === "VD") &&
-    new Date(`${shift.date}T00:00:00Z`).getUTCDay() === 6;
+  const times = getShiftTimes(shift.code, shift.date);
 
   return {
     ...shift,
     label: map?.label ?? shift.code,
     type: map?.type ?? "unknown",
-    startTime: map?.start ?? null,
-    endTime: isSaturdayEarly ? "16:00" : (map?.end ?? null)
+    startTime: times.startTime,
+    endTime: times.endTime,
   };
 }

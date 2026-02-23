@@ -1,27 +1,16 @@
-const corePattern = [
-  "E", "E", "E",
-  "L", "L", "L",
-  "R", "R", "R",
-  "E", "E", "E",
-  "L", "L", "L",
-  "R", "R", "R",
-  "E", "E", "E",
-  "N", "N", "N",
-  "R", "R", "R",
-] as const;
+import { CORE_PATTERN, CORE_START_DATE } from "@/lib/corePattern";
 
-const coreStartDate = "2026-01-31";
-const patternLength = corePattern.length;
+const patternLength = CORE_PATTERN.length;
 const millisecondsPerDay = 24 * 60 * 60 * 1000;
 
-export function getCoreShift(date: string): string {
-  const anchorTime = new Date(`${coreStartDate}T00:00:00Z`).getTime();
-  const dateTime = new Date(`${date}T00:00:00Z`).getTime();
+export function getCoreShift(dateISO: string): string {
+  const anchorTime = new Date(`${CORE_START_DATE}T00:00:00Z`).getTime();
+  const dateTime = new Date(`${dateISO}T00:00:00Z`).getTime();
 
   const diffDays = Math.floor((dateTime - anchorTime) / millisecondsPerDay);
   const index = ((diffDays % patternLength) + patternLength) % patternLength;
 
-  const code = corePattern[index];
-  console.log("[getCoreShift]", { date, diffDays, index, code });
+  const code = CORE_PATTERN[index];
+  console.log("[getCoreShift] resolved", { dateISO, diffDays, index, code });
   return code;
 }

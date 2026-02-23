@@ -26,6 +26,7 @@ export async function resolveShift(
   firestoreShift?: EnrichedShift,
   useCorePattern = true,
 ): Promise<EnrichedShift | null> {
+  // Priority: seeded/stored Firestore shifts -> explicit override -> generated core pattern.
   if (firestoreShift) {
     console.log("[resolveShift] using firestore shift", { date, code: firestoreShift.code });
     return firestoreShift;
