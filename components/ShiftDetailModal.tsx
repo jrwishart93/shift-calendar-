@@ -8,7 +8,7 @@ type ShiftDetailModalProps = {
   shift: EnrichedShift | null;
   isAdmin: boolean;
   onClose: () => void;
-  onSave?: (updated: EnrichedShift) => void;
+  onSave?: (updated: EnrichedShift) => Promise<void> | void;
 };
 
 const shiftTypeOptions = [
@@ -23,6 +23,8 @@ const shiftTypeOptions = [
 ] as const;
 
 export default function ShiftDetailModal({ date, shift, isAdmin, onClose, onSave }: ShiftDetailModalProps) {
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [form, setForm] = useState({
     type: shift?.type ?? "rest",
     startTime: shift?.startTime ?? "",
@@ -111,16 +113,27 @@ export default function ShiftDetailModal({ date, shift, isAdmin, onClose, onSave
           {isAdmin && shift ? (
             <button
               type="button"
-              onClick={() => {
-                onSave?.({ ...shift, ...form, note: form.note });
-                onClose();
+              disabled={saving}
+              onClick={async () => {
+                setSaving(true);
+                setSaveError(null);
+
+                try {
+                  await onSave?.({ ...shift, ...form, note: form.note });
+                  onClose();
+                } catch (error) {
+                  setSaveError(error instanceof Error ? error.message : "Failed to save shift.");
+                } finally {
+                  setSaving(false);
+                }
               }}
-              className="rounded-lg bg-sky-400 px-3 py-1.5 text-sm font-semibold text-slate-950"
+              className="rounded-lg bg-sky-400 px-3 py-1.5 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Save
+              {saving ? "Saving..." : "Save"}
             </button>
           ) : null}
         </div>
+        {saveError ? <p className="mt-2 text-xs text-rose-300">{saveError}</p> : null}
       </div>
     </dialog>
   );

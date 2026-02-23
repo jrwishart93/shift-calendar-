@@ -8,6 +8,7 @@ import ShiftDetailModal from "./ShiftDetailModal";
 import ExportCalendarButton from "./ExportCalendarButton";
 import ShareButton from "./ShareButton";
 import BottomTabBar, { type TabId } from "./BottomTabBar";
+import { saveShiftEdit, subscribeToShiftEdit } from "@/lib/shiftEdits";
 
 const STORAGE_KEY = "viewMode";
 const EDITS_STORAGE_KEY = "shiftEdits";
@@ -43,15 +44,42 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
       setActiveTab(savedMode);
     }
 
-    const savedEdits = window.localStorage.getItem(EDITS_STORAGE_KEY);
-    if (savedEdits) {
-      try {
-        setEditedShifts(JSON.parse(savedEdits));
-      } catch {
-        // ignore malformed data
-      }
-    }
-  }, []);
+    const unsubscribes = shifts.map((shift) =>
+      subscribeToShiftEdit(
+        shift.date,
+        (updatedShift) => {
+          setEditedShifts((current) => {
+            if (!updatedShift) {
+              if (!current[shift.date]) {
+                return current;
+              }
+
+              const { [shift.date]: _, ...rest } = current;
+              return rest;
+            }
+
+            return { ...current, [shift.date]: updatedShift };
+          });
+        },
+        () => {
+          const savedEdits = window.localStorage.getItem(EDITS_STORAGE_KEY);
+          if (!savedEdits) {
+            return;
+          }
+
+          try {
+            setEditedShifts(JSON.parse(savedEdits));
+          } catch {
+            // ignore malformed data
+          }
+        },
+      )
+    );
+
+    return () => {
+      unsubscribes.forEach((unsubscribe) => unsubscribe());
+    };
+  }, [shifts]);
 
   function handleTabChange(tab: TabId) {
     setActiveTab(tab);
@@ -157,12 +185,14 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
               setSelectedDate(null);
               setSelectedShift(null);
             }}
-            onSave={(updated) => {
+            onSave={async (updated) => {
               setEditedShifts((current) => {
                 const next = { ...current, [updated.date]: updated };
                 window.localStorage.setItem(EDITS_STORAGE_KEY, JSON.stringify(next));
                 return next;
               });
+
+              await saveShiftEdit(updated);
             }}
           />
         ) : null}
