@@ -47,71 +47,70 @@ export default function SignUpPage() {
   };
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center p-6">
-      <h1 className="mb-2 text-2xl font-semibold">Create account</h1>
-      <p className="mb-4 text-sm text-gray-600">Sign up with email and password. Access code is optional.</p>
+    <main className="auth-shell">
+      <section className="auth-card">
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Shift-Calendar</p>
+        <h1 className="mt-2 text-2xl font-semibold text-slate-100">Create account</h1>
+        <p className="mt-2 text-sm text-slate-300">Create your account and start tracking shifts in seconds.</p>
 
-      <form onSubmit={handleSubmit} className="space-y-4 rounded border border-gray-300 p-4">
-        <label className="block">
-          <span className="mb-1 block text-sm font-medium">Display name (optional)</span>
-          <input
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2"
-            placeholder="Jamie"
-          />
-        </label>
+        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium text-slate-200">Display name (optional)</span>
+            <input
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              className="auth-input"
+              placeholder="Jamie"
+            />
+          </label>
 
-        <label className="block">
-          <span className="mb-1 block text-sm font-medium">Email</span>
-          <input
-            required
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2"
-            placeholder="jamie@example.com"
-          />
-        </label>
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium text-slate-200">Email</span>
+            <input
+              required
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="auth-input"
+              placeholder="jamie@example.com"
+            />
+          </label>
 
-        <label className="block">
-          <span className="mb-1 block text-sm font-medium">Password</span>
-          <input
-            required
-            minLength={6}
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2"
-            placeholder="••••••••"
-          />
-        </label>
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium text-slate-200">Password</span>
+            <input
+              required
+              minLength={6}
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="auth-input"
+              placeholder="••••••••"
+            />
+          </label>
 
-        <label className="block">
-          <span className="mb-1 block text-sm font-medium">Access code (optional)</span>
-          <input
-            value={accessCode}
-            onChange={(e) => setAccessCode(e.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2"
-            placeholder="Enter code for Jamie's shifts"
-          />
-          <span className="mt-1 block text-xs text-gray-500">
-            Use <strong>{JAMIE_ACCESS_CODE}</strong> to load Jamie's shifts.
-          </span>
-        </label>
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium text-slate-200">Access code (optional)</span>
+            <input
+              value={accessCode}
+              onChange={(e) => setAccessCode(e.target.value)}
+              className="auth-input"
+              placeholder="Enter code for Jamie's shifts"
+            />
+            <span className="mt-1 block text-xs text-slate-400">
+              Use <strong>{JAMIE_ACCESS_CODE}</strong> to load Jamie's shifts.
+            </span>
+          </label>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50"
-        >
-          {isSubmitting ? "Creating account..." : "Sign up"}
-        </button>
-      </form>
+          <button type="submit" disabled={isSubmitting} className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-50">
+            {isSubmitting ? "Creating account..." : "Sign up"}
+          </button>
+        </form>
 
-      {successMessage ? <p className="mt-4 text-sm text-green-700">{successMessage}</p> : null}
-      {error ? <p className="mt-2 text-sm text-red-700">{error.message}</p> : null}
-      {currentUser ? <p className="mt-2 text-sm text-gray-600">Signed in as {currentUser.email}</p> : null}
+        {successMessage ? <p className="mt-4 text-sm text-emerald-300">{successMessage}</p> : null}
+        {error ? <p className="mt-2 text-sm text-rose-300">{error.message}</p> : null}
+        {currentUser ? <p className="mt-2 text-sm text-slate-300">Signed in as {currentUser.email}</p> : null}
+      </section>
     </main>
   );
 }
