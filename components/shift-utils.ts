@@ -38,11 +38,16 @@ export function getDayCellStyles(type?: string) {
 export function enrichShift(shift: RawShift): EnrichedShift {
   const map = shiftMap[shift.code];
 
+  // Saturday early shifts end at 16:00 instead of 15:00
+  const isSaturdayEarly =
+    (shift.code === "E" || shift.code === "VD") &&
+    new Date(`${shift.date}T00:00:00Z`).getUTCDay() === 6;
+
   return {
     ...shift,
     label: map?.label ?? shift.code,
     type: map?.type ?? "unknown",
     startTime: map?.start ?? null,
-    endTime: map?.end ?? null
+    endTime: isSaturdayEarly ? "16:00" : (map?.end ?? null)
   };
 }

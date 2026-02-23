@@ -2,11 +2,11 @@ export const shiftMap: Record<string, any> = {
   E: { type: "early", label: "Early Shift", start: "07:00", end: "15:00" },
   VD: { type: "early", label: "Early Shift", start: "07:00", end: "15:00" },
 
-  L: { type: "late", label: "Late Shift", start: "14:00", end: "22:00" },
-  VL: { type: "late", label: "Late Shift", start: "14:00", end: "22:00" },
+  L: { type: "late", label: "Late Shift", start: "14:00", end: "23:00" },
+  VL: { type: "late", label: "Late Shift (Court)", start: "13:00", end: "22:00" },
 
   N: { type: "night", label: "Night Shift", start: "22:00", end: "07:00" },
-  VN: { type: "night", label: "Night Shift", start: "22:00", end: "07:00" },
+  VN: { type: "night", label: "Night Shift (Court)", start: "18:00", end: "21:00" },
 
   R: { type: "rest", label: "Rest Day" },
   RR: { type: "rest", label: "Re-Rostered Rest" },
