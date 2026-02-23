@@ -11,6 +11,11 @@ npm run dev
 
 Open `http://localhost:3000`.
 
+## Image folders
+
+- `public/images/` for general public images you want to serve from the app.
+- `app/images/` for app-level images, including your web app icon source file.
+
 ## Data files
 
 - `data/shiftMap.ts` maps rota codes to labels/types/times.
