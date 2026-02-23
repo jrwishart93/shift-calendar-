@@ -2,15 +2,32 @@
 
 export const dynamic = "force-dynamic";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/hooks/useAuth";
 
 export default function LoginPage() {
   const { signIn, error, currentUser, signOut } = useAuth();
+  const router = useRouter();
+  const [nextPath, setNextPath] = useState("/dashboard");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const next = new URLSearchParams(window.location.search).get("next");
+    if (next) {
+      setNextPath(next);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (currentUser) {
+      router.replace(nextPath);
+    }
+  }, [currentUser, nextPath, router]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

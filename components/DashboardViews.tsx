@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import type { EnrichedShift } from "./types";
 import WeekView from "./WeekView";
 import MonthCalendar from "./MonthCalendar";
@@ -8,10 +9,8 @@ import ShiftDetailModal from "./ShiftDetailModal";
 import ExportCalendarButton from "./ExportCalendarButton";
 import ShareButton from "./ShareButton";
 import BottomTabBar, { type TabId } from "./BottomTabBar";
-import { doc, onSnapshot } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { useAuth } from "@/hooks/useAuth";
-import { DEFAULT_CALENDAR_ID, saveShiftEdit, subscribeToShiftEdits } from "@/lib/shiftEdits";
+import { saveShiftEdit, subscribeToShiftEdits } from "@/lib/shiftEdits";
 
 const STORAGE_KEY = "viewMode";
 const EDITS_STORAGE_KEY = "shiftEdits";
@@ -35,19 +34,8 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
   const [selectedShift, setSelectedShift] = useState<EnrichedShift | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [editedShifts, setEditedShifts] = useState<Record<string, EnrichedShift>>({});
-  const { currentUser } = useAuth();
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    if (!currentUser) {
-      setIsAdmin(false);
-      return;
-    }
-
-    return onSnapshot(doc(db, "calendars", DEFAULT_CALENDAR_ID, "members", currentUser.uid), (snapshot) => {
-      setIsAdmin(snapshot.exists() && snapshot.data().role === "admin");
-    });
-  }, [currentUser]);
+  const { currentUser, signOut } = useAuth();
+  const canEdit = Boolean(currentUser);
 
   useEffect(() => {
     const savedMode = window.localStorage.getItem(STORAGE_KEY);
@@ -99,11 +87,29 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
             <h1 className="text-lg font-bold leading-none text-slate-100">Jamie's 2026 Shifts</h1>
             <p className="mt-0.5 text-[11px] text-slate-500">Shift rota</p>
           </div>
-          {isAdmin && (
-            <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-300">
-              Admin
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            {currentUser ? (
+              <>
+                <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-300">
+                  Signed in
+                </span>
+                <button
+                  type="button"
+                  onClick={() => void signOut()}
+                  className="rounded-lg border border-[#2a4269] px-2.5 py-1 text-xs text-slate-300 transition hover:bg-[#111a3d]"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login?next=/dashboard"
+                className="rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-2.5 py-1 text-xs font-medium text-cyan-300 transition hover:bg-cyan-500/20"
+              >
+                Sign in to edit
+              </Link>
+            )}
+          </div>
         </div>
       </header>
 
@@ -112,7 +118,7 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
           <div className="h-full">
             <MonthCalendar
               shifts={effectiveShifts}
-              isAdmin={isAdmin}
+              isAdmin={canEdit}
               onDaySelect={(shift, date) => {
                 setSelectedShift(shift);
                 setSelectedDate(date);
@@ -175,14 +181,14 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
           <ShiftDetailModal
             date={selectedDate}
             shift={selectedShift}
-            isAdmin={isAdmin}
+            isAdmin={canEdit}
             onClose={() => {
               setSelectedDate(null);
               setSelectedShift(null);
             }}
             onSave={async (updated) => {
-              if (!isAdmin) {
-                throw new Error("Only calendar admins can save shift edits.");
+              if (!canEdit) {
+                throw new Error("Please sign in to edit and save shifts.");
               }
 
               setEditedShifts((current) => {
