@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { generateMonthGrid } from "@/utils/generateMonthGrid";
 import { typeColours } from "./shift-utils";
 import type { EnrichedShift } from "./types";
@@ -45,19 +46,21 @@ export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: 
         <button
           type="button"
           onClick={() => moveMonth(-1)}
-          className="rounded-lg border border-slate-700 px-3 py-1 text-sm text-slate-200 hover:bg-slate-800"
+          className="inline-flex items-center gap-1 rounded-lg border border-slate-700 px-3 py-1 text-sm text-slate-200 transition hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
           aria-label="Go to previous month"
         >
-          ←
+          <ChevronLeft size={16} strokeWidth={2} aria-hidden="true" />
+          <span>Prev</span>
         </button>
         <h2 className="text-base font-semibold">{monthLabel}</h2>
         <button
           type="button"
           onClick={() => moveMonth(1)}
-          className="rounded-lg border border-slate-700 px-3 py-1 text-sm text-slate-200 hover:bg-slate-800"
+          className="inline-flex items-center gap-1 rounded-lg border border-slate-700 px-3 py-1 text-sm text-slate-200 transition hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
           aria-label="Go to next month"
         >
-          →
+          <span>Next</span>
+          <ChevronRight size={16} strokeWidth={2} aria-hidden="true" />
         </button>
       </div>
 
