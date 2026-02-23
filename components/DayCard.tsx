@@ -4,7 +4,7 @@ import type { EnrichedShift } from "./types";
 export default function DayCard({ shift, compact = false }: { shift: EnrichedShift; compact?: boolean }) {
   return (
     <article
-      className={`rounded-xl border p-3 ${typeColours[shift.type] ?? typeColours.unknown} ${compact ? "min-h-20" : ""}`}
+      className={`glass-panel rounded-xl border p-3 ${typeColours[shift.type] ?? typeColours.unknown} ${compact ? "min-h-20" : ""}`}
     >
       <p className="text-xs opacity-80">{new Date(shift.date).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}</p>
       <p className="font-semibold">{shift.label}</p>

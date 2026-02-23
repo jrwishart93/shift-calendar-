@@ -40,21 +40,21 @@ export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: 
   }
 
   return (
-    <section>
+    <section className="glass-panel rounded-2xl p-4">
       <div className="mb-3 flex items-center justify-between">
         <button
           type="button"
           onClick={() => moveMonth(-1)}
-          className="rounded-lg border border-slate-700 px-3 py-1 text-sm text-slate-200 hover:bg-slate-800"
+          className="btn-secondary px-3 py-1 text-sm text-slate-200"
           aria-label="Go to previous month"
         >
           ←
         </button>
-        <h2 className="text-base font-semibold">{monthLabel}</h2>
+        <h2 className="text-base font-semibold text-slate-100">{monthLabel}</h2>
         <button
           type="button"
           onClick={() => moveMonth(1)}
-          className="rounded-lg border border-slate-700 px-3 py-1 text-sm text-slate-200 hover:bg-slate-800"
+          className="btn-secondary px-3 py-1 text-sm text-slate-200"
           aria-label="Go to next month"
         >
           →
@@ -86,13 +86,15 @@ export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: 
                   key={day.date}
                   type="button"
                   onClick={() => onDaySelect?.(shift ?? null, day.date)}
-                  className={`relative min-h-24 rounded-lg border border-slate-800 p-1.5 text-left transition hover:border-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${
-                    day.isCurrentMonth ? "bg-slate-900" : "bg-slate-900/50 text-slate-500"
+                  className={`relative min-h-24 rounded-lg border p-1.5 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${
+                    day.isCurrentMonth
+                      ? "border-slate-700/60 bg-slate-900/70 hover:border-blue-400/50"
+                      : "border-slate-800/70 bg-slate-900/35 text-slate-500"
                   } ${shift ? typeColours[shift.type] ?? typeColours.unknown : ""}`}
                   aria-label={`${ariaParts.join(", ")}. ${isAdmin ? "Admin edit mode" : "Read only mode"}`}
                 >
                   <span className="text-xs font-semibold">{day.dayNumber}</span>
-                  {day.isToday ? <span className="pointer-events-none absolute inset-0 rounded-lg ring-2 ring-cyan-400" /> : null}
+                  {day.isToday ? <span className="pointer-events-none absolute inset-0 rounded-lg ring-2 ring-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.5)]" /> : null}
                   {shift ? (
                     <div className="mt-2">
                       <p className="truncate text-sm font-semibold leading-tight">{shift.code}</p>
