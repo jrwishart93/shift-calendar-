@@ -1,12 +1,11 @@
 import Header from "@/components/Header";
 import ShareButton from "@/components/ShareButton";
-import WeekView from "@/components/WeekView";
+import DashboardViews from "@/components/DashboardViews";
 import { getAllShifts, getToday } from "./lib";
 
 export default function HomePage() {
   const shifts = getAllShifts();
   const today = getToday();
-  const startIdx = Math.max(0, shifts.findIndex((shift) => shift.date >= today));
 
   return (
     <main>
@@ -17,7 +16,7 @@ export default function HomePage() {
           <p className="text-xl font-semibold">{today}</p>
         </div>
         <ShareButton />
-        <WeekView shifts={shifts.slice(startIdx, startIdx + 7)} />
+        <DashboardViews shifts={shifts} today={today} />
       </div>
     </main>
   );
