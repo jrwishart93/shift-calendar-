@@ -20,5 +20,6 @@ export const shiftMap: Record<string, any> = {
   SB: { type: "service_break", label: "Service Break" },
   T: { type: "toil", label: "Time Off In Lieu" },
 
-  PH: { type: "public_holiday", label: "Public Holiday" }
+  PH: { type: "public_holiday", label: "Public Holiday" },
+  A: { type: "public_holiday", label: "Public Holiday" }
 };

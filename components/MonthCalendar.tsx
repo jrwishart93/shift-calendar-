@@ -105,7 +105,33 @@ export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: 
         ))}
       </div>
 
-      {/* Example screenshot: ![Month calendar mobile](artifacts/month-mobile-v2.png) */}
+      <details className="group rounded-2xl border border-[#1e3460] bg-[#080f28]">
+        <summary className="cursor-pointer list-none px-4 py-3 text-xs font-medium text-slate-400 select-none hover:text-slate-200">
+          <span className="group-open:hidden">▸ Shift key</span>
+          <span className="hidden group-open:inline">▾ Shift key</span>
+        </summary>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 px-4 pb-4 sm:grid-cols-3">
+          {[
+            { code: "E / VD", label: "Early Shift", color: "text-emerald-300", dot: "bg-emerald-400" },
+            { code: "L / VL", label: "Late Shift", color: "text-amber-300", dot: "bg-amber-400" },
+            { code: "N / VN", label: "Night Shift", color: "text-violet-300", dot: "bg-violet-400" },
+            { code: "R / RR", label: "Rest Day", color: "text-sky-300", dot: "bg-sky-400" },
+            { code: "AL", label: "Annual Leave", color: "text-teal-300", dot: "bg-teal-400" },
+            { code: "LR", label: "Leave Requested", color: "text-cyan-300", dot: "bg-cyan-400" },
+            { code: "SB", label: "Service Break", color: "text-fuchsia-300", dot: "bg-fuchsia-400" },
+            { code: "T", label: "Time Off In Lieu", color: "text-blue-300", dot: "bg-blue-400" },
+            { code: "W", label: "Court", color: "text-rose-300", dot: "bg-rose-400" },
+            { code: "C", label: "Course", color: "text-orange-300", dot: "bg-orange-400" },
+            { code: "PH / A", label: "Public Holiday", color: "text-indigo-300", dot: "bg-indigo-400" },
+          ].map(({ code, label, color, dot }) => (
+            <div key={code} className="flex items-center gap-2">
+              <span className={`h-2 w-2 shrink-0 rounded-full ${dot}`} />
+              <span className={`text-xs font-bold ${color}`}>{code}</span>
+              <span className="text-xs text-slate-400">{label}</span>
+            </div>
+          ))}
+        </div>
+      </details>
     </section>
   );
 }

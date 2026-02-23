@@ -58,7 +58,10 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
     <main className="min-h-screen bg-[#000a24]">
       <header className="sticky top-0 z-10 border-b border-[#1f3760] bg-[#000a24]/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          <h1 className="text-2xl font-semibold leading-none text-slate-100">Shift-Calendar</h1>
+          <div>
+            <h1 className="text-xl font-bold leading-none text-slate-100">Jamie's 2026 Shifts</h1>
+            <p className="mt-0.5 text-xs text-slate-500">Shift rota</p>
+          </div>
           {isAdmin && (
             <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-300">
               Admin
