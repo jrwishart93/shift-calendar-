@@ -16,6 +16,23 @@ import { updateResolveShiftOverrideCache } from "@/utils/resolveShift";
 
 const STORAGE_KEY = "viewMode";
 const EDITS_STORAGE_KEY = "shiftEdits";
+const PROFILE_STORAGE_KEY = "userProfile";
+
+type TopTab = "dashboard" | "profile";
+
+type UserProfile = {
+  fullName: string;
+  email: string;
+  shiftPattern: string;
+  startupCalendar: TabId;
+};
+
+const DEFAULT_PROFILE: UserProfile = {
+  fullName: "",
+  email: "",
+  shiftPattern: "E, L, N, R",
+  startupCalendar: "month",
+};
 
 const SHIFT_LEGEND = [
   { code: "E / VD", label: "Early Shift",      color: "text-emerald-300", dot: "bg-emerald-400" },
@@ -42,7 +59,10 @@ export default function DashboardViews({
   calendarName?: string;
   useCorePattern?: boolean;
 }) {
+  const [topTab, setTopTab] = useState<TopTab>("dashboard");
   const [activeTab, setActiveTab] = useState<TabId>("month");
+  const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
+  const [profileSaved, setProfileSaved] = useState(false);
   const [selectedShift, setSelectedShift] = useState<EnrichedShift | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [editedShifts, setEditedShifts] = useState<Record<string, EnrichedShift>>({});
@@ -51,9 +71,40 @@ export default function DashboardViews({
   const canEdit = Boolean(currentUser);
 
   useEffect(() => {
-    const savedMode = window.localStorage.getItem(STORAGE_KEY);
-    if (savedMode === "week" || savedMode === "month" || savedMode === "share") {
-      setActiveTab(savedMode);
+    const savedProfile = window.localStorage.getItem(PROFILE_STORAGE_KEY);
+    if (savedProfile) {
+      try {
+        const parsedProfile = JSON.parse(savedProfile) as Partial<UserProfile>;
+        const startupCalendar = parsedProfile.startupCalendar;
+        const normalizedStartupCalendar = startupCalendar === "week" || startupCalendar === "month" || startupCalendar === "share"
+          ? startupCalendar
+          : DEFAULT_PROFILE.startupCalendar;
+
+        const nextProfile: UserProfile = {
+          fullName: parsedProfile.fullName ?? DEFAULT_PROFILE.fullName,
+          email: parsedProfile.email ?? DEFAULT_PROFILE.email,
+          shiftPattern: parsedProfile.shiftPattern ?? DEFAULT_PROFILE.shiftPattern,
+          startupCalendar: normalizedStartupCalendar,
+        };
+
+        setProfile(nextProfile);
+        setActiveTab(nextProfile.startupCalendar);
+      } catch {
+        setProfile(DEFAULT_PROFILE);
+      }
+    } else {
+      const savedMode = window.localStorage.getItem(STORAGE_KEY);
+      if (savedMode === "week" || savedMode === "month" || savedMode === "share") {
+        setActiveTab(savedMode);
+      }
+    }
+
+    if (currentUser) {
+      setProfile((current) => ({
+        ...current,
+        fullName: current.fullName || currentUser.displayName || "",
+        email: current.email || currentUser.email || "",
+      }));
     }
 
     const unsubscribeShiftEdits = subscribeToShiftEdits(
@@ -84,7 +135,7 @@ export default function DashboardViews({
       unsubscribeShiftEdits();
       unsubscribeOverrides();
     };
-  }, []);
+  }, [currentUser]);
 
 
   useEffect(() => {
@@ -94,6 +145,17 @@ export default function DashboardViews({
   function handleTabChange(tab: TabId) {
     setActiveTab(tab);
     window.localStorage.setItem(STORAGE_KEY, tab);
+  }
+
+  function handleProfileSave(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    window.localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+    window.localStorage.setItem(STORAGE_KEY, profile.startupCalendar);
+    setActiveTab(profile.startupCalendar);
+    setProfileSaved(true);
+    window.setTimeout(() => {
+      setProfileSaved(false);
+    }, 2500);
   }
 
   const effectiveShifts = useMemo(
@@ -138,10 +200,35 @@ export default function DashboardViews({
             )}
           </div>
         </div>
+
+        <div className="mx-auto flex w-full max-w-6xl gap-2 px-4 pb-3 sm:px-6">
+          <button
+            type="button"
+            onClick={() => setTopTab("dashboard")}
+            className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+              topTab === "dashboard"
+                ? "bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-400/40"
+                : "bg-[#111a3d] text-slate-300"
+            }`}
+          >
+            Dashboard
+          </button>
+          <button
+            type="button"
+            onClick={() => setTopTab("profile")}
+            className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+              topTab === "profile"
+                ? "bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-400/40"
+                : "bg-[#111a3d] text-slate-300"
+            }`}
+          >
+            User profile
+          </button>
+        </div>
       </header>
 
       <section className="min-h-0 flex-1 overflow-hidden px-3 pt-2 sm:px-4">
-        {activeTab === "month" && (
+        {topTab === "dashboard" && activeTab === "month" && (
           <div className="h-full">
             <MonthCalendar
               shifts={effectiveShifts}
@@ -155,7 +242,7 @@ export default function DashboardViews({
           </div>
         )}
 
-        {activeTab === "week" && (
+        {topTab === "dashboard" && activeTab === "week" && (
           <div className="h-full overflow-y-auto pb-2">
             <WeekView
               shifts={effectiveShifts}
@@ -169,7 +256,7 @@ export default function DashboardViews({
           </div>
         )}
 
-        {activeTab === "share" && (
+        {topTab === "dashboard" && activeTab === "share" && (
           <div className="h-full overflow-y-auto pb-2 space-y-4">
             <details className="group rounded-2xl border border-[#2a4269] bg-[#0a1635]">
               <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-slate-100 select-none hover:text-white">
@@ -203,6 +290,73 @@ export default function DashboardViews({
               </p>
               <ExportCalendarButton shifts={effectiveShifts} />
             </div>
+          </div>
+        )}
+
+        {topTab === "profile" && (
+          <div className="mx-auto w-full max-w-3xl overflow-y-auto pb-10">
+            <form onSubmit={handleProfileSave} className="space-y-4 rounded-2xl border border-[#2a4269] bg-[#0a1635] p-5">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-100">User profile</h2>
+                <p className="mt-1 text-sm text-slate-400">
+                  Update your details and choose which calendar view opens by default.
+                </p>
+              </div>
+
+              <label className="block text-sm text-slate-200">
+                Full name
+                <input
+                  type="text"
+                  value={profile.fullName}
+                  onChange={(event) => setProfile((current) => ({ ...current, fullName: event.target.value }))}
+                  placeholder="Your name"
+                  className="mt-1 w-full rounded-lg border border-[#2a4269] bg-[#111a3d] px-3 py-2 text-sm text-slate-100"
+                />
+              </label>
+
+              <label className="block text-sm text-slate-200">
+                Email
+                <input
+                  type="email"
+                  value={profile.email}
+                  onChange={(event) => setProfile((current) => ({ ...current, email: event.target.value }))}
+                  placeholder="you@example.com"
+                  className="mt-1 w-full rounded-lg border border-[#2a4269] bg-[#111a3d] px-3 py-2 text-sm text-slate-100"
+                />
+              </label>
+
+              <label className="block text-sm text-slate-200">
+                Shift pattern
+                <textarea
+                  value={profile.shiftPattern}
+                  onChange={(event) => setProfile((current) => ({ ...current, shiftPattern: event.target.value }))}
+                  placeholder="e.g. E, E, L, L, N, N, R, R"
+                  className="mt-1 min-h-24 w-full rounded-lg border border-[#2a4269] bg-[#111a3d] px-3 py-2 text-sm text-slate-100"
+                />
+              </label>
+
+              <label className="block text-sm text-slate-200">
+                Startup calendar
+                <select
+                  value={profile.startupCalendar}
+                  onChange={(event) => setProfile((current) => ({ ...current, startupCalendar: event.target.value as TabId }))}
+                  className="mt-1 w-full rounded-lg border border-[#2a4269] bg-[#111a3d] px-3 py-2 text-sm text-slate-100"
+                >
+                  <option value="month">Calendar (month)</option>
+                  <option value="week">Week view</option>
+                  <option value="share">Share</option>
+                </select>
+              </label>
+
+              <button
+                type="submit"
+                className="rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-300 transition hover:bg-cyan-500/20"
+              >
+                Save profile
+              </button>
+
+              {profileSaved ? <p className="text-xs text-emerald-300">Profile saved successfully.</p> : null}
+            </form>
           </div>
         )}
 
@@ -251,7 +405,7 @@ export default function DashboardViews({
         ) : null}
       </section>
 
-      <BottomTabBar activeTab={activeTab} onChange={handleTabChange} />
+      {topTab === "dashboard" ? <BottomTabBar activeTab={activeTab} onChange={handleTabChange} /> : null}
     </main>
   );
 }
