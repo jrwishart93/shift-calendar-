@@ -32,8 +32,12 @@ Set these env vars first:
 - `FIREBASE_API_KEY`
 - `FIREBASE_AUTH_DOMAIN`
 - `FIREBASE_PROJECT_ID`
+- `FIREBASE_STORAGE_BUCKET`
+- `FIREBASE_MESSAGING_SENDER_ID`
+- `FIREBASE_APP_ID`
+- `FIREBASE_MEASUREMENT_ID`
 
-For the Next.js app, `FIREBASE_API_KEY` is also mapped to `NEXT_PUBLIC_FIREBASE_API_KEY` in `next.config.js`, so Vercel only needs `FIREBASE_API_KEY` configured.
+For the Next.js app, each `FIREBASE_*` variable is mapped to the equivalent `NEXT_PUBLIC_FIREBASE_*` variable in `next.config.js`, so Vercel can be configured with either naming scheme.
 
 ## Persist admin edits to Firestore
 
