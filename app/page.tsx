@@ -12,9 +12,9 @@ export default function HomePage() {
     <main className="px-safe pb-safe">
       <Header />
       <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-4">
-        <div className="rounded-xl border border-slate-800 bg-slate-900 p-4">
-          <p className="text-sm text-slate-300">Today</p>
-          <p className="text-xl font-semibold">{today}</p>
+        <div className="rounded-2xl border border-cyan-400/20 bg-gradient-to-r from-slate-900 to-slate-900/70 p-4 shadow-xl shadow-cyan-950/20">
+          <p className="text-sm text-cyan-200/80">Today</p>
+          <p className="text-xl font-semibold tracking-tight">{today}</p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <ShareButton />

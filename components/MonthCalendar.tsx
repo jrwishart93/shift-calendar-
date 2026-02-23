@@ -40,21 +40,21 @@ export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: 
   }
 
   return (
-    <section>
+    <section className="rounded-2xl border border-white/10 bg-slate-900/70 p-3 shadow-xl shadow-black/20 sm:p-4">
       <div className="mb-3 flex items-center justify-between">
         <button
           type="button"
           onClick={() => moveMonth(-1)}
-          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-700 px-4 text-base text-slate-200 transition hover:bg-slate-800 active:scale-[0.98] active:bg-slate-700"
+          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/15 bg-slate-900/80 px-4 text-base text-slate-100 transition duration-200 hover:border-cyan-400/40 hover:bg-slate-800 active:scale-[0.98] active:bg-slate-700"
           aria-label="Go to previous month"
         >
           ←
         </button>
-        <h2 className="text-base font-semibold">{monthLabel}</h2>
+        <h2 className="text-base font-semibold tracking-wide text-slate-100">{monthLabel}</h2>
         <button
           type="button"
           onClick={() => moveMonth(1)}
-          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-700 px-4 text-base text-slate-200 transition hover:bg-slate-800 active:scale-[0.98] active:bg-slate-700"
+          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/15 bg-slate-900/80 px-4 text-base text-slate-100 transition duration-200 hover:border-cyan-400/40 hover:bg-slate-800 active:scale-[0.98] active:bg-slate-700"
           aria-label="Go to next month"
         >
           →
@@ -86,7 +86,7 @@ export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: 
                   key={day.date}
                   type="button"
                   onClick={() => onDaySelect?.(shift ?? null, day.date)}
-                  className={`relative min-h-24 rounded-lg border border-slate-800 p-1.5 text-left transition hover:border-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${
+                  className={`relative min-h-24 rounded-lg border border-slate-800 p-1.5 text-left transition duration-200 hover:-translate-y-0.5 hover:border-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 active:scale-[0.98] ${
                     day.isCurrentMonth ? "bg-slate-900" : "bg-slate-900/50 text-slate-500"
                   } ${shift ? typeColours[shift.type] ?? typeColours.unknown : ""}`}
                   aria-label={`${ariaParts.join(", ")}. ${isAdmin ? "Admin edit mode" : "Read only mode"}`}
