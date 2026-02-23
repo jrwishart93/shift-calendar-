@@ -11,7 +11,7 @@ type ViewMode = "week" | "month";
 const STORAGE_KEY = "viewMode";
 
 export default function DashboardViews({ shifts, today }: { shifts: EnrichedShift[]; today: string }) {
-  const [viewMode, setViewMode] = useState<ViewMode>("week");
+  const [viewMode, setViewMode] = useState<ViewMode>("month");
   const [selectedShift, setSelectedShift] = useState<EnrichedShift | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
@@ -39,7 +39,10 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
 
   return (
     <>
-      <ViewModeToggle viewMode={viewMode} onChange={handleViewModeChange} />
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-lg font-semibold">Monthly shifts</h2>
+        <ViewModeToggle viewMode={viewMode} onChange={handleViewModeChange} />
+      </div>
       {viewMode === "week" ? (
         <WeekView shifts={shifts.slice(startIdx, startIdx + 7)} />
       ) : (

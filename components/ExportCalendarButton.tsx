@@ -10,10 +10,10 @@ export default function ExportCalendarButton({ shifts }: { shifts: EnrichedShift
     <button
       type="button"
       onClick={() => exportCalendar(shifts)}
-      className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-lg bg-violet-500 px-5 py-2 text-sm font-semibold text-white sm:w-auto"
+      className="inline-flex min-h-[36px] items-center justify-center gap-2 rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-200 transition hover:bg-slate-800"
     >
       <CalendarDays aria-hidden="true" size={17} />
-      <span>Export to Calendar</span>
+      <span>Export Calendar</span>
     </button>
   );
 }
