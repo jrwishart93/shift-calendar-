@@ -8,6 +8,10 @@ import ShiftDetailModal from "./ShiftDetailModal";
 import ExportCalendarButton from "./ExportCalendarButton";
 import ShareButton from "./ShareButton";
 import BottomTabBar, { type TabId } from "./BottomTabBar";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { useAuth } from "@/hooks/useAuth";
+import { DEFAULT_CALENDAR_ID, saveShiftEdit, subscribeToShiftEdits } from "@/lib/shiftEdits";
 
 const STORAGE_KEY = "viewMode";
 const EDITS_STORAGE_KEY = "shiftEdits";
@@ -31,11 +35,19 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
   const [selectedShift, setSelectedShift] = useState<EnrichedShift | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [editedShifts, setEditedShifts] = useState<Record<string, EnrichedShift>>({});
+  const { currentUser } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  const isAdmin = useMemo(() => {
-    if (typeof window === "undefined") return false;
-    return new URLSearchParams(window.location.search).get("role") === "admin";
-  }, []);
+  useEffect(() => {
+    if (!currentUser) {
+      setIsAdmin(false);
+      return;
+    }
+
+    return onSnapshot(doc(db, "calendars", DEFAULT_CALENDAR_ID, "members", currentUser.uid), (snapshot) => {
+      setIsAdmin(snapshot.exists() && snapshot.data().role === "admin");
+    });
+  }, [currentUser]);
 
   useEffect(() => {
     const savedMode = window.localStorage.getItem(STORAGE_KEY);
@@ -43,14 +55,25 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
       setActiveTab(savedMode);
     }
 
-    const savedEdits = window.localStorage.getItem(EDITS_STORAGE_KEY);
-    if (savedEdits) {
-      try {
-        setEditedShifts(JSON.parse(savedEdits));
-      } catch {
-        // ignore malformed data
-      }
-    }
+    const unsubscribe = subscribeToShiftEdits(
+      (updates) => {
+        setEditedShifts(updates);
+      },
+      () => {
+        const savedEdits = window.localStorage.getItem(EDITS_STORAGE_KEY);
+        if (!savedEdits) {
+          return;
+        }
+
+        try {
+          setEditedShifts(JSON.parse(savedEdits));
+        } catch {
+          // ignore malformed data
+        }
+      },
+    );
+
+    return unsubscribe;
   }, []);
 
   function handleTabChange(tab: TabId) {
@@ -157,12 +180,18 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
               setSelectedDate(null);
               setSelectedShift(null);
             }}
-            onSave={(updated) => {
+            onSave={async (updated) => {
+              if (!isAdmin) {
+                throw new Error("Only calendar admins can save shift edits.");
+              }
+
               setEditedShifts((current) => {
                 const next = { ...current, [updated.date]: updated };
                 window.localStorage.setItem(EDITS_STORAGE_KEY, JSON.stringify(next));
                 return next;
               });
+
+              await saveShiftEdit(updated);
             }}
           />
         ) : null}
