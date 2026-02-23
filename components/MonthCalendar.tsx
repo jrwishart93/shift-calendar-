@@ -13,8 +13,6 @@ type MonthCalendarProps = {
   onDaySelect?: (shift: EnrichedShift | null, date: string) => void;
 };
 
-const weekDays = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
-
 const monthFormatter = new Intl.DateTimeFormat(undefined, {
   month: "long",
   year: "numeric",
@@ -26,7 +24,6 @@ export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: 
   const [displayDate, setDisplayDate] = useState(new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1)));
 
   const shiftByDate = useMemo(() => Object.fromEntries(shifts.map((shift) => [shift.date, shift])), [shifts]);
-
   const weeks = useMemo(() => generateMonthGrid(displayDate.getUTCFullYear(), displayDate.getUTCMonth()), [displayDate]);
 
   const monthPrefix = `${String(displayDate.getUTCFullYear())}-${String(displayDate.getUTCMonth() + 1).padStart(2, "0")}`;
@@ -45,18 +42,20 @@ export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: 
   }
 
   return (
-    <section className="space-y-3">
-      <div className="flex items-center justify-between gap-2">
+    <section className="flex h-full flex-col gap-1.5">
+
+      {/* Month navigation — compact */}
+      <div className="shrink-0 flex items-center justify-between gap-2">
         <button
           type="button"
           onClick={() => moveMonth(-1)}
-          className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[#294066] bg-[#08132d] text-slate-200 transition hover:bg-[#0e1e40]"
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#294066] bg-[#08132d] text-slate-200 transition hover:bg-[#0e1e40]"
           aria-label="Go to previous month"
         >
-          <ChevronLeft size={24} />
+          <ChevronLeft size={18} />
         </button>
-        <div className="flex flex-col items-center gap-1">
-          <h2 className="text-4xl font-semibold leading-none text-slate-100">{monthFormatter.format(displayDate)}</h2>
+        <div className="flex min-w-0 flex-col items-center gap-0.5">
+          <h2 className="text-2xl font-semibold leading-none text-slate-100">{monthFormatter.format(displayDate)}</h2>
           {!isViewingCurrentMonth && (
             <button
               type="button"
@@ -70,24 +69,32 @@ export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: 
         <button
           type="button"
           onClick={() => moveMonth(1)}
-          className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[#294066] bg-[#08132d] text-slate-200 transition hover:bg-[#0e1e40]"
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#294066] bg-[#08132d] text-slate-200 transition hover:bg-[#0e1e40]"
           aria-label="Go to next month"
         >
-          <ChevronRight size={24} />
+          <ChevronRight size={18} />
         </button>
       </div>
 
-      <MonthStats shifts={monthShifts} />
+      {/* Monthly shift counts */}
+      <div className="shrink-0">
+        <MonthStats shifts={monthShifts} />
+      </div>
 
-      <div className="grid grid-cols-7 gap-1.5 text-center text-xs font-semibold tracking-[0.12em] text-slate-400">
-        {weekDays.map((day) => (
-          <span key={day}>{day}</span>
+      {/* Day-of-week headers */}
+      <div className="shrink-0 grid grid-cols-7 text-center">
+        {["M","T","W","T","F","S","S"].map((d, i) => (
+          <span key={i} className="text-[10px] font-semibold tracking-wider text-slate-500 sm:hidden">{d}</span>
+        ))}
+        {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((d) => (
+          <span key={d} className="hidden text-[11px] font-semibold tracking-widest text-slate-400 sm:block">{d}</span>
         ))}
       </div>
 
-      <div className="space-y-2">
+      {/* Calendar grid — rows share remaining height equally */}
+      <div className="flex min-h-0 flex-1 flex-col gap-1">
         {weeks.map((week) => (
-          <div key={week[0].date} className="grid grid-cols-7 gap-2">
+          <div key={week[0].date} className="grid min-h-0 flex-1 grid-cols-7 gap-1">
             {week.map((day, index) => (
               <DayCell
                 key={day.date}
@@ -105,33 +112,6 @@ export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: 
         ))}
       </div>
 
-      <details className="group rounded-2xl border border-[#1e3460] bg-[#080f28]">
-        <summary className="cursor-pointer list-none px-4 py-3 text-xs font-medium text-slate-400 select-none hover:text-slate-200">
-          <span className="group-open:hidden">▸ Shift key</span>
-          <span className="hidden group-open:inline">▾ Shift key</span>
-        </summary>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-2 px-4 pb-4 sm:grid-cols-3">
-          {[
-            { code: "E / VD", label: "Early Shift", color: "text-emerald-300", dot: "bg-emerald-400" },
-            { code: "L / VL", label: "Late Shift", color: "text-amber-300", dot: "bg-amber-400" },
-            { code: "N / VN", label: "Night Shift", color: "text-violet-300", dot: "bg-violet-400" },
-            { code: "R / RR", label: "Rest Day", color: "text-sky-300", dot: "bg-sky-400" },
-            { code: "AL", label: "Annual Leave", color: "text-teal-300", dot: "bg-teal-400" },
-            { code: "LR", label: "Leave Requested", color: "text-cyan-300", dot: "bg-cyan-400" },
-            { code: "SB", label: "Service Break", color: "text-fuchsia-300", dot: "bg-fuchsia-400" },
-            { code: "T", label: "Time Off In Lieu", color: "text-blue-300", dot: "bg-blue-400" },
-            { code: "W", label: "Court", color: "text-rose-300", dot: "bg-rose-400" },
-            { code: "C", label: "Course", color: "text-orange-300", dot: "bg-orange-400" },
-            { code: "PH / A", label: "Public Holiday", color: "text-indigo-300", dot: "bg-indigo-400" },
-          ].map(({ code, label, color, dot }) => (
-            <div key={code} className="flex items-center gap-2">
-              <span className={`h-2 w-2 shrink-0 rounded-full ${dot}`} />
-              <span className={`text-xs font-bold ${color}`}>{code}</span>
-              <span className="text-xs text-slate-400">{label}</span>
-            </div>
-          ))}
-        </div>
-      </details>
     </section>
   );
 }

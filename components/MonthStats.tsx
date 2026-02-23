@@ -26,27 +26,18 @@ export default function MonthStats({ shifts }: { shifts: EnrichedShift[] }) {
 
   if (entries.length === 0) return null;
 
-  const workingDays = shifts.filter(
-    (s) => s.startTime && s.endTime && !["rest", "service_break"].includes(s.type)
-  ).length;
-
   return (
-    <div className="space-y-2">
-      <div className="flex flex-wrap gap-1.5" aria-label="Monthly shift breakdown">
-        {entries.map(({ type, label }) => (
-          <span
-            key={type}
-            title={type.replaceAll("_", " ")}
-            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${typeColours[type] ?? typeColours.unknown}`}
-          >
-            {label}
-            <span className="font-bold">{counts[type]}</span>
-          </span>
-        ))}
-      </div>
-      {workingDays > 0 && (
-        <p className="text-xs text-slate-400">{workingDays} working day{workingDays !== 1 ? "s" : ""} this month</p>
-      )}
+    <div className="flex gap-1 overflow-x-auto pb-0.5 [scrollbar-width:none]" aria-label="Monthly shift breakdown">
+      {entries.map(({ type, label }) => (
+        <span
+          key={type}
+          title={type.replaceAll("_", " ")}
+          className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${typeColours[type] ?? typeColours.unknown}`}
+        >
+          {label}
+          <span className="font-bold">{counts[type]}</span>
+        </span>
+      ))}
     </div>
   );
 }

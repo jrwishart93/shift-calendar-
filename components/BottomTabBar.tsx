@@ -18,7 +18,7 @@ const TABS: { id: TabId; label: string; Icon: React.ComponentType<{ size?: numbe
 export default function BottomTabBar({ activeTab, onChange }: BottomTabBarProps) {
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-20 border-t border-[#1f3760] bg-[#000a24]/95 backdrop-blur"
+      className="shrink-0 border-t border-[#1f3760] bg-[#000a24]"
       aria-label="Main navigation"
     >
       <div className="mx-auto flex w-full max-w-6xl">

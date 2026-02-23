@@ -45,7 +45,6 @@ export default function DayCell({
       month: "long"
     })
   ];
-
   if (shift) {
     ariaParts.push(`${shift.label} (${shift.code})`);
     if (shift.startTime && shift.endTime) {
@@ -60,29 +59,34 @@ export default function DayCell({
     <button
       type="button"
       onClick={() => onSelect(shift, date)}
-      className={`relative min-h-[88px] rounded-2xl border p-2 text-left transition duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 ${
-        isCurrentMonth ? styles.card : "border-slate-800 bg-[#070f23] text-slate-600"
+      className={`relative flex h-full w-full flex-col items-center justify-center rounded-xl border p-1 text-center transition duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 ${
+        isCurrentMonth ? styles.card : "border-slate-800 bg-[#070f23]"
       } ${isWeekend ? "shadow-[inset_0_0_0_1px_rgba(148,163,184,0.04)]" : ""}`}
       aria-label={`${ariaParts.join(", ")}. ${isAdmin ? "Admin editable" : "Viewer read only"}`}
     >
-      <span className={`${isCurrentMonth ? "text-slate-300" : "text-slate-600"} text-xs font-semibold`}>
+      {/* Day number — top-left */}
+      <span className={`absolute left-1.5 top-1 text-[10px] font-semibold leading-none ${isCurrentMonth ? "text-slate-400" : "text-slate-700"}`}>
         {dayNumber}
       </span>
-      {isToday ? <span className="pointer-events-none absolute inset-0 rounded-2xl ring-2 ring-cyan-300" /> : null}
+
+      {/* Today ring */}
+      {isToday ? <span className="pointer-events-none absolute inset-0 rounded-xl ring-2 ring-cyan-300" /> : null}
+
+      {/* Note indicator */}
       {shift?.note ? (
-        <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden="true" title="Has note" />
+        <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden="true" />
       ) : null}
-      {shift ? (
-        <div className="mt-1.5">
-          <p className={`text-xl font-bold leading-none tracking-tight ${styles.code}`}>{shift.code}</p>
-          <p className={`mt-0.5 text-[10px] font-medium leading-none ${styles.code} opacity-75`}>{shortLabel}</p>
+
+      {/* Centred shift content */}
+      {shift && isCurrentMonth ? (
+        <>
+          <p className={`text-sm font-bold leading-none tracking-tight ${styles.code}`}>{shift.code}</p>
+          <p className={`mt-0.5 text-[9px] font-medium leading-none ${styles.code} opacity-70`}>{shortLabel}</p>
           {hasHours && (
-            <p className={`mt-1 text-[10px] leading-none ${styles.time}`}>{shift.startTime}–{shift.endTime}</p>
+            <p className={`mt-0.5 text-[8px] leading-none ${styles.time}`}>{shift.startTime}–{shift.endTime}</p>
           )}
-        </div>
-      ) : (
-        <p className="mt-6 text-xs text-slate-600">—</p>
-      )}
+        </>
+      ) : null}
     </button>
   );
 }
