@@ -1,10 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Header from "./Header";
 import type { EnrichedShift } from "./types";
 import WeekView from "./WeekView";
 import MonthCalendar from "./MonthCalendar";
 import ViewModeToggle from "./ViewModeToggle";
+import ShiftDetailModal from "./ShiftDetailModal";
+import ExportCalendarButton from "./ExportCalendarButton";
+import ShareButton from "./ShareButton";
 
 type ViewMode = "week" | "month";
 
@@ -14,6 +18,7 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
   const [viewMode, setViewMode] = useState<ViewMode>("month");
   const [selectedShift, setSelectedShift] = useState<EnrichedShift | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [editedShifts, setEditedShifts] = useState<Record<string, EnrichedShift>>({});
 
   const isAdmin = useMemo(() => {
     if (typeof window === "undefined") {
@@ -35,58 +40,69 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
     window.localStorage.setItem(STORAGE_KEY, mode);
   }
 
-  const startIdx = Math.max(0, shifts.findIndex((shift) => shift.date >= today));
+  const effectiveShifts = useMemo(() => shifts.map((shift) => editedShifts[shift.date] ?? shift), [editedShifts, shifts]);
+
+  const publicLink = useMemo(() => {
+    if (typeof window === "undefined") {
+      return "shift-calendar.vercel.app/jamie";
+    }
+
+    return `${window.location.host}/jamie`;
+  }, []);
 
   return (
-    <>
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="text-lg font-semibold">Monthly shifts</h2>
-        <ViewModeToggle viewMode={viewMode} onChange={handleViewModeChange} />
-      </div>
-      {viewMode === "week" ? (
-        <WeekView shifts={shifts.slice(startIdx, startIdx + 7)} />
-      ) : (
-        <MonthCalendar
-          shifts={shifts}
-          isAdmin={isAdmin}
-          onDaySelect={(shift, date) => {
-            setSelectedShift(shift);
-            setSelectedDate(date);
-          }}
-        />
-      )}
-
-      {selectedDate ? (
-        <dialog open className="fixed inset-0 z-20 m-0 flex h-full w-full items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-sm rounded-xl border border-slate-700 bg-slate-900 p-4 text-slate-100">
-            <p className="text-xs uppercase tracking-wide text-slate-400">{isAdmin ? "Admin edit mode" : "Read only mode"}</p>
-            <h3 className="mt-1 text-lg font-semibold">{selectedDate}</h3>
-            {selectedShift ? (
-              <>
-                <p className="mt-2 text-sm">{selectedShift.label} ({selectedShift.code})</p>
-                {selectedShift.startTime && selectedShift.endTime ? (
-                  <p className="text-sm text-slate-300">{selectedShift.startTime}–{selectedShift.endTime}</p>
-                ) : null}
-              </>
-            ) : (
-              <p className="mt-2 text-sm text-slate-300">No shift assigned.</p>
-            )}
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedDate(null);
-                  setSelectedShift(null);
-                }}
-                className="rounded-lg border border-slate-700 px-3 py-1.5 text-sm hover:bg-slate-800"
-              >
-                Close
-              </button>
-              {isAdmin ? <button type="button" className="rounded-lg bg-cyan-500 px-3 py-1.5 text-sm font-semibold text-slate-950">Edit shift</button> : null}
-            </div>
+    <main className="min-h-screen bg-[#000a24]">
+      <Header />
+      <section className="mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 pb-10 pt-3 sm:px-6">
+        <div className="space-y-2">
+          <ShareButton />
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm text-slate-300">{isAdmin ? "Admin mode" : "Viewer mode"}</p>
+            <ExportCalendarButton shifts={effectiveShifts} />
           </div>
-        </dialog>
-      ) : null}
-    </>
+        </div>
+
+        <div className="rounded-3xl border border-[#2a4269] bg-[#0a1635] p-1">
+          <ViewModeToggle viewMode={viewMode} onChange={handleViewModeChange} />
+        </div>
+
+        {viewMode === "week" ? (
+          <WeekView
+            shifts={effectiveShifts}
+            today={today}
+            onDaySelect={(shift, date) => {
+              setSelectedShift(shift);
+              setSelectedDate(date);
+            }}
+          />
+        ) : (
+          <MonthCalendar
+            shifts={effectiveShifts}
+            isAdmin={isAdmin}
+            onDaySelect={(shift, date) => {
+              setSelectedShift(shift);
+              setSelectedDate(date);
+            }}
+          />
+        )}
+
+        <div className="mx-auto w-full max-w-3xl rounded-full border border-[#2a4269] bg-[#111a3d] px-5 py-3 text-center text-lg text-slate-300">
+          {publicLink}
+        </div>
+
+        {selectedDate ? (
+          <ShiftDetailModal
+            date={selectedDate}
+            shift={selectedShift}
+            isAdmin={isAdmin}
+            onClose={() => {
+              setSelectedDate(null);
+              setSelectedShift(null);
+            }}
+            onSave={(updated) => setEditedShifts((current) => ({ ...current, [updated.date]: updated }))}
+          />
+        ) : null}
+      </section>
+    </main>
   );
 }
