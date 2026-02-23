@@ -50,6 +50,9 @@ export default function DayCell({
     >
       <span className={`${isCurrentMonth ? "text-slate-300" : "text-slate-600"} text-xs font-semibold`}>{dayNumber}</span>
       {isToday ? <span className="pointer-events-none absolute inset-0 rounded-2xl ring-2 ring-cyan-300" /> : null}
+      {shift?.note ? (
+        <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden="true" title="Has note" />
+      ) : null}
       {shift ? (
         <div className="mt-2">
           <p className={`text-[38px] font-bold leading-none tracking-tight ${styles.code}`}>{shift.code}</p>

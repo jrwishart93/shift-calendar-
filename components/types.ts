@@ -1,7 +1,7 @@
 export type RawShift = {
   date: string;
   code: string;
-  note: string;
+  note?: string;
 };
 
 export type EnrichedShift = RawShift & {

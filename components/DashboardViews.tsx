@@ -13,6 +13,7 @@ import ShareButton from "./ShareButton";
 type ViewMode = "week" | "month";
 
 const STORAGE_KEY = "viewMode";
+const EDITS_STORAGE_KEY = "shiftEdits";
 
 export default function DashboardViews({ shifts, today }: { shifts: EnrichedShift[]; today: string }) {
   const [viewMode, setViewMode] = useState<ViewMode>("month");
@@ -32,6 +33,15 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
     const savedMode = window.localStorage.getItem(STORAGE_KEY);
     if (savedMode === "week" || savedMode === "month") {
       setViewMode(savedMode);
+    }
+
+    const savedEdits = window.localStorage.getItem(EDITS_STORAGE_KEY);
+    if (savedEdits) {
+      try {
+        setEditedShifts(JSON.parse(savedEdits));
+      } catch {
+        // Ignore malformed data
+      }
     }
   }, []);
 
@@ -99,7 +109,13 @@ export default function DashboardViews({ shifts, today }: { shifts: EnrichedShif
               setSelectedDate(null);
               setSelectedShift(null);
             }}
-            onSave={(updated) => setEditedShifts((current) => ({ ...current, [updated.date]: updated }))}
+            onSave={(updated) => {
+              setEditedShifts((current) => {
+                const next = { ...current, [updated.date]: updated };
+                window.localStorage.setItem(EDITS_STORAGE_KEY, JSON.stringify(next));
+                return next;
+              });
+            }}
           />
         ) : null}
       </section>

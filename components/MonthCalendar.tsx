@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { generateMonthGrid } from "@/utils/generateMonthGrid";
 import type { EnrichedShift } from "./types";
 import DayCell from "./DayCell";
+import MonthStats from "./MonthStats";
 
 type MonthCalendarProps = {
   shifts: EnrichedShift[];
@@ -28,8 +29,19 @@ export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: 
 
   const weeks = useMemo(() => generateMonthGrid(displayDate.getUTCFullYear(), displayDate.getUTCMonth()), [displayDate]);
 
+  const monthPrefix = `${String(displayDate.getUTCFullYear())}-${String(displayDate.getUTCMonth() + 1).padStart(2, "0")}`;
+  const monthShifts = useMemo(() => shifts.filter((s) => s.date.startsWith(monthPrefix)), [shifts, monthPrefix]);
+
+  const isViewingCurrentMonth =
+    displayDate.getUTCFullYear() === today.getUTCFullYear() &&
+    displayDate.getUTCMonth() === today.getUTCMonth();
+
   function moveMonth(offset: number) {
     setDisplayDate((current) => new Date(Date.UTC(current.getUTCFullYear(), current.getUTCMonth() + offset, 1)));
+  }
+
+  function goToToday() {
+    setDisplayDate(new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1)));
   }
 
   return (
@@ -43,7 +55,18 @@ export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: 
         >
           <ChevronLeft size={24} />
         </button>
-        <h2 className="text-4xl font-semibold leading-none text-slate-100">{monthFormatter.format(displayDate)}</h2>
+        <div className="flex flex-col items-center gap-1">
+          <h2 className="text-4xl font-semibold leading-none text-slate-100">{monthFormatter.format(displayDate)}</h2>
+          {!isViewingCurrentMonth && (
+            <button
+              type="button"
+              onClick={goToToday}
+              className="rounded-full border border-cyan-500/40 bg-cyan-500/10 px-3 py-0.5 text-xs font-medium text-cyan-300 transition hover:bg-cyan-500/20"
+            >
+              Today
+            </button>
+          )}
+        </div>
         <button
           type="button"
           onClick={() => moveMonth(1)}
@@ -53,6 +76,8 @@ export default function MonthCalendar({ shifts, isAdmin = false, onDaySelect }: 
           <ChevronRight size={24} />
         </button>
       </div>
+
+      <MonthStats shifts={monthShifts} />
 
       <div className="grid grid-cols-7 gap-1.5 text-center text-xs font-semibold tracking-[0.12em] text-slate-400">
         {weekDays.map((day) => (
