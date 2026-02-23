@@ -3,8 +3,8 @@ import "./globals.css";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
 export const metadata: Metadata = {
-  title: "Shift-Calendar",
-  description: "Personal shift rota viewer",
+  title: "Jamie's 2026 Shifts",
+  description: "Jamie's 2026 shift rota",
   icons: {
     icon: "/shift-calendar-icon.jpg",
     apple: "/shift-calendar-icon.jpg"
