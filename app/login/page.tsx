@@ -44,30 +44,33 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center p-6">
-      <h1 className="mb-4 text-2xl font-semibold">Sign in</h1>
+    <main className="auth-shell">
+      <section className="auth-card">
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Shift-Calendar</p>
+        <h1 className="mt-2 text-2xl font-semibold text-slate-100">Welcome back</h1>
+        <p className="mt-2 text-sm text-slate-300">Sign in to check your rota and keep your team synced.</p>
 
-      <form onSubmit={handleSubmit} className="space-y-4 rounded border border-gray-300 p-4">
+        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
         <label className="block">
-          <span className="mb-1 block text-sm font-medium">Email</span>
+            <span className="mb-1 block text-sm font-medium text-slate-200">Email</span>
           <input
             required
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2"
+              className="auth-input"
             placeholder="jamie@example.com"
           />
         </label>
 
         <label className="block">
-          <span className="mb-1 block text-sm font-medium">Password</span>
+            <span className="mb-1 block text-sm font-medium text-slate-200">Password</span>
           <input
             required
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2"
+              className="auth-input"
             placeholder="••••••••"
           />
         </label>
@@ -75,29 +78,30 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50"
+            className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting ? "Signing in..." : "Sign in"}
         </button>
 
         <Link
           href="/signup"
-          className="block w-full rounded border border-black px-4 py-2 text-center text-sm font-medium text-black"
+            className="btn-secondary block w-full text-center text-sm"
         >
           Sign up
         </Link>
       </form>
 
-      {error ? <p className="mt-2 text-sm text-red-700">{error.message}</p> : null}
+        {error ? <p className="mt-3 text-sm text-rose-300">{error.message}</p> : null}
 
-      {currentUser ? (
-        <div className="mt-4 space-y-2 text-sm text-gray-700">
-          <p>Signed in as {currentUser.email}</p>
-          <button onClick={() => void signOut()} className="rounded bg-gray-200 px-3 py-1">
-            Sign out
-          </button>
-        </div>
-      ) : null}
+        {currentUser ? (
+          <div className="mt-4 space-y-2 text-sm text-slate-300">
+            <p>Signed in as {currentUser.email}</p>
+            <button onClick={() => void signOut()} className="btn-secondary px-3 py-1 text-xs">
+              Sign out
+            </button>
+          </div>
+        ) : null}
+      </section>
     </main>
   );
 }
