@@ -48,12 +48,13 @@ export default function DashboardPage() {
   const [isResolving, setIsResolving] = useState(true);
   const hasGuestBypass = useMemo(() => {
     const hasGuestParam = searchParams.get("guest") === "jamie";
+    const hasPublicParam = searchParams.get("public") === "jamie";
     if (typeof window === "undefined") {
-      return hasGuestParam;
+      return hasGuestParam || hasPublicParam;
     }
 
     const hasStoredBypass = window.localStorage.getItem("jamieAccessBypass") === "true";
-    return hasGuestParam || hasStoredBypass;
+    return hasGuestParam || hasPublicParam || hasStoredBypass;
   }, [searchParams]);
 
   const [error, setError] = useState<string | null>(null);

@@ -66,6 +66,12 @@ export default function LoginPage() {
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Shift-Calendar</p>
         <h1 className="mt-2 text-2xl font-semibold text-slate-100">Welcome back</h1>
         <p className="mt-2 text-sm text-slate-300">Sign in to check your rota and keep your team synced.</p>
+        <Link
+          href="/dashboard?public=jamie"
+          className="mt-4 inline-flex rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-3 py-2 text-sm font-medium text-cyan-200 transition hover:bg-cyan-500/20"
+        >
+          View Jamie&apos;s calendar (read-only)
+        </Link>
 
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
         <label className="block">
